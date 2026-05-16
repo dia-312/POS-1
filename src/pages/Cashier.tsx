@@ -1,0 +1,479 @@
+
+import { useEffect, useState } from "react";
+
+import {
+  getProducts,
+} from "../lib/database";
+import { useCartStore } from "../store/useCartStore";
+import toast from "react-hot-toast";
+import CheckoutModal from "../components/ui/CheckoutModal";
+import { useOrdersStore } from "../store/useOrdersStore";
+import { createSale} from "../lib/database";
+
+
+export default function Cashier() {
+  const [search, setSearch] = useState("");
+
+ const [products, setProducts] =
+  useState<any[]>([]);
+
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const {
+  cart,
+  addToCart,
+  removeFromCart,
+  increaseQuantity,
+  decreaseQuantity,
+  clearCart,
+} = useCartStore();
+  
+  const { addOrder } = useOrdersStore();
+
+  const filteredProducts = products.filter(
+  (product) => {
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "All" ||
+      product.category ===
+        selectedCategory;
+
+    return (
+      matchesSearch &&
+      matchesCategory
+    );
+  }
+);
+
+  const total = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+ const handleCheckout = async () => {
+  await createSale(total);
+
+  const orderData = {
+    id: Date.now(),
+    items: cart,
+    total,
+    createdAt:
+      new Date().toISOString(),
+  };
+
+  addOrder(orderData);
+
+  /* PRINT RECEIPT */
+
+  const receiptWindow =
+    window.open(
+      "",
+      "_blank",
+      "width=400,height=700"
+    );
+
+  if (receiptWindow) {
+    receiptWindow.document.write(`
+      <html>
+        <head>
+          <title>Receipt</title>
+
+          <style>
+            body {
+              font-family: Arial;
+              padding: 20px;
+            }
+
+            h1 {
+              text-align: center;
+            }
+
+            .item {
+              display: flex;
+              justify-content: space-between;
+              margin: 8px 0;
+            }
+
+            .total {
+              margin-top: 20px;
+              font-size: 20px;
+              font-weight: bold;
+              display: flex;
+              justify-content: space-between;
+            }
+          </style>
+        </head>
+
+        <body>
+          <h1>POS RECEIPT</h1>
+
+          <p>
+            Order ID:
+            #${orderData.id}
+          </p>
+
+          <p>
+            ${new Date(
+              orderData.createdAt
+            ).toLocaleString()}
+          </p>
+
+          <hr />
+
+          ${orderData.items
+            .map(
+              (item) => `
+                <div class="item">
+                  <span>
+                    ${item.name}
+                    x${item.quantity}
+                  </span>
+
+                  <span>
+                    $${(
+                      item.price *
+                      item.quantity
+                    ).toFixed(2)}
+                  </span>
+                </div>
+              `
+            )
+            .join("")}
+
+          <hr />
+
+          <div class="total">
+            <span>Total</span>
+
+            <span>
+              $${orderData.total.toFixed(
+                2
+              )}
+            </span>
+          </div>
+
+          <script>
+            window.onload = () => {
+              window.print();
+
+              setTimeout(() => {
+                window.close();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+
+    receiptWindow.document.close();
+  }
+
+  toast.success(
+    "Order Created Successfully"
+  );
+
+  clearCart();
+
+  setCheckoutOpen(false);
+};
+
+
+
+useEffect(() => {
+  loadProducts();
+}, []);
+
+const loadProducts = async () => {
+  const data =
+    await getProducts();
+
+  setProducts(data);
+};
+
+
+  return (
+  <div className="flex h-full gap-6">
+
+    {/* PRODUCTS SECTION */}
+
+    <div className="flex-1 flex flex-col">
+
+      {/* HEADER */}
+
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-white mb-4">
+          Cashier
+        </h1>
+
+        {/* SEARCH */}
+
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          className="
+            w-full
+            bg-slate-800
+            border border-slate-700
+            rounded-2xl
+            px-5 py-4
+            text-white
+            outline-none
+            text-lg
+          "
+        />
+
+        {/* CATEGORIES */}
+
+        <div className="flex gap-3 mt-4 flex-wrap">
+          {[
+            "All",
+            "Drinks",
+            "Food",
+            "Snacks",
+            "Desserts",
+          ].map((cat) => (
+            <button
+              key={cat}
+              onClick={() =>
+                setSelectedCategory(cat)
+              }
+              className={`
+                px-5 py-2 rounded-xl
+                transition
+                font-medium
+                ${
+                  selectedCategory === cat
+                    ? "bg-blue-600 text-white"
+                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                }
+              `}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* PRODUCTS GRID */}
+
+      <div className="
+        grid
+        grid-cols-2
+        xl:grid-cols-3
+        gap-5
+        overflow-auto
+        pr-2
+      ">
+        {filteredProducts.map((product) => (
+          <div
+            key={product.id}
+            className="
+              bg-slate-800
+              rounded-2xl
+              overflow-hidden
+              border border-slate-700
+              hover:border-blue-500
+              transition
+            "
+          >
+            <img
+              src={
+                product.image ||
+                "https://placehold.co/400x250?text=Product"
+              }
+              alt={product.name}
+              className="h-40 w-full object-cover"
+            />
+
+            <div className="p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-white text-lg font-semibold">
+                  {product.name}
+                </h2>
+
+                <span className="text-green-400 font-bold">
+                  ${product.price}
+                </span>
+              </div>
+
+              <button
+                onClick={() =>
+                  addToCart(product)
+                }
+                className="
+                  w-full
+                  bg-blue-600
+                  hover:bg-blue-700
+                  text-white
+                  py-3
+                  rounded-xl
+                  font-semibold
+                  transition
+                "
+              >
+                Add To Cart
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* CART SECTION */}
+
+    <div className="
+      w-[340px]
+      bg-slate-900
+      border border-slate-800
+      rounded-2xl
+      p-5
+      flex flex-col
+    ">
+
+      <div className="mb-5">
+        <h2 className="text-2xl font-bold text-white">
+          Current Order
+        </h2>
+
+        <p className="text-slate-400 text-sm mt-1">
+          {cart.length} Items
+        </p>
+      </div>
+
+      {/* CART ITEMS */}
+
+      <div className="flex-1 overflow-auto space-y-3 pr-1">
+        {cart.map((item) => (
+          <div
+            key={item.id}
+            className="
+              bg-slate-800
+              rounded-xl
+              p-3
+            "
+          >
+            <div className="flex justify-between">
+              <div>
+                <h3 className="text-white font-medium">
+                  {item.name}
+                </h3>
+
+                <div className="flex items-center gap-2 mt-3">
+
+                  <button
+                    onClick={() =>
+                      decreaseQuantity(item.id)
+                    }
+                    className="
+                      w-7 h-7
+                      rounded-lg
+                      bg-slate-700
+                      text-white
+                    "
+                  >
+                    -
+                  </button>
+
+                  <span className="text-white w-5 text-center">
+                    {item.quantity}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      increaseQuantity(item.id)
+                    }
+                    className="
+                      w-7 h-7
+                      rounded-lg
+                      bg-slate-700
+                      text-white
+                    "
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <p className="text-white font-bold">
+                  $
+                  {(
+                    item.price *
+                    item.quantity
+                  ).toFixed(2)}
+                </p>
+
+                <button
+                  onClick={() =>
+                    removeFromCart(item.id)
+                  }
+                  className="
+                    text-red-400
+                    text-sm
+                    mt-3
+                    hover:text-red-300
+                  "
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* TOTAL */}
+
+      <div className="
+        border-t border-slate-700
+        pt-5 mt-5
+      ">
+        <div className="flex justify-between items-center mb-5">
+          <span className="text-slate-300 text-lg">
+            Total
+          </span>
+
+          <span className="text-3xl font-bold text-white">
+            ${total.toFixed(2)}
+          </span>
+        </div>
+
+        <button
+          onClick={() =>
+            setCheckoutOpen(true)
+          }
+          className="
+            w-full
+            bg-green-600
+            hover:bg-green-700
+            text-white
+            py-4
+            rounded-2xl
+            text-lg
+            font-bold
+            transition
+          "
+        >
+          Checkout
+        </button>
+      </div>
+    </div>
+
+    <CheckoutModal
+      open={checkoutOpen}
+      onClose={() =>
+        setCheckoutOpen(false)
+      }
+      onConfirm={handleCheckout}
+      total={total}
+    />
+  </div>
+);
+}
