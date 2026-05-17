@@ -34,19 +34,26 @@ export async function initDB() {
   /* PRODUCTS */
 
   await database.execute(`
-    CREATE TABLE IF NOT EXISTS products (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      stock INTEGER NOT NULL,
-      category TEXT,
-      sizes TEXT
-    )
-  `);
+  CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    stock INTEGER NOT NULL,
+    category TEXT,
+    sizes TEXT
+  )
+`);
 
-  try {
+try {
   await database.execute(`
     ALTER TABLE products
     ADD COLUMN sizes TEXT
+  `);
+} catch {}
+
+try {
+  await database.execute(`
+    ALTER TABLE products
+    ADD COLUMN price REAL DEFAULT 0
   `);
 } catch {}
 

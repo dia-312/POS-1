@@ -41,6 +41,9 @@ export default function Cashier() {
 
   const filteredProducts = products.filter(
     (product) => {
+      if (!product || !product.name || product.name.trim() === "") {
+        return false;
+      }
 
       const matchesSearch =
         product.name
@@ -81,61 +84,7 @@ export default function Cashier() {
 
     /* PRINT RECEIPT */
 
-    const receiptWindow =
-      window.open(
-        "",
-        "_blank",
-        "width=400,height=700"
-      );
-
-    if (receiptWindow) {
-
-      receiptWindow.document.write(`
-        <html>
-          <head>
-            <title>Receipt</title>
-
-            <style>
-              body {
-                font-family: Arial;
-                padding: 20px;
-              }
-
-              h1 {
-                text-align: center;
-              }
-
-              .item {
-                margin: 10px 0;
-                border-bottom: 1px dashed #ccc;
-                padding-bottom: 8px;
-              }
-
-              .row {
-                display: flex;
-                justify-content: space-between;
-              }
-
-              .note {
-                font-size: 12px;
-                color: gray;
-                margin-top: 4px;
-              }
-
-              .total {
-                margin-top: 20px;
-                font-size: 20px;
-                font-weight: bold;
-                display: flex;
-                justify-content: space-between;
-              }
-            </style>
-          </head>
-
-          <body>
-
-            <h1>POS RECEIPT</h1>
-
+    const receiptHTML = `
             <p>
               Order ID:
               #${orderData.id}
@@ -195,22 +144,110 @@ export default function Cashier() {
                 ₪${orderData.total.toFixed(2)}
               </span>
             </div>
+    `;
 
-            <script>
-              window.onload = () => {
-                window.print();
+    const fullHtml = `
+        <html>
+          <head>
+            <title>Receipt</title>
 
-                setTimeout(() => {
-                  window.close();
-                }, 500);
-              };
-            </script>
+            <style>
+              body {
+                font-family: Arial;
+                padding: 20px;
+                color: black;
+              }
+
+              h1 {
+                text-align: center;
+                margin-bottom: 5px;
+              }
+
+              h2 {
+                text-align: center;
+                font-size: 14px;
+                color: #555;
+                margin-top: 0;
+                margin-bottom: 20px;
+              }
+
+              .item {
+                margin: 10px 0;
+                border-bottom: 1px dashed #ccc;
+                padding-bottom: 8px;
+              }
+
+              .row {
+                display: flex;
+                justify-content: space-between;
+              }
+
+              .note {
+                font-size: 12px;
+                color: gray;
+                margin-top: 4px;
+              }
+
+              .total {
+                margin-top: 20px;
+                font-size: 20px;
+                font-weight: bold;
+                display: flex;
+                justify-content: space-between;
+              }
+
+              .divider {
+                border-top: 2px dashed black;
+                margin: 40px 0;
+              }
+
+              @media print {
+                .page-break {
+                  page-break-after: always;
+                }
+              }
+            </style>
+          </head>
+
+          <body>
+
+            <!-- CUSTOMER COPY -->
+            <h1>POS RECEIPT</h1>
+            <h2>(Customer Copy)</h2>
+            ${receiptHTML}
+
+            <div class="divider page-break"></div>
+
+            <!-- BARISTA COPY -->
+            <h1>POS RECEIPT</h1>
+            <h2>(Barista Copy)</h2>
+            ${receiptHTML}
 
           </body>
         </html>
-      `);
+    `;
 
-      receiptWindow.document.close();
+    const printWindow = document.createElement("iframe");
+    printWindow.style.position = "fixed";
+    printWindow.style.right = "0";
+    printWindow.style.bottom = "0";
+    printWindow.style.width = "0";
+    printWindow.style.height = "0";
+    printWindow.style.border = "0";
+    document.body.appendChild(printWindow);
+
+    const doc = printWindow.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(fullHtml);
+      doc.close();
+
+      printWindow.contentWindow?.focus();
+      printWindow.contentWindow?.print();
+
+      setTimeout(() => {
+        document.body.removeChild(printWindow);
+      }, 1000);
     }
 
     toast.success(
@@ -276,8 +313,15 @@ export default function Cashier() {
 
             {[
               "All",
-              "Drinks",
-              "Food",
+              "Ice",
+              "Natural",
+              "Smoothie",
+              "Milkeshake",
+              "Mojito",
+              "Hot",
+              "Cocktail",
+              "Healthy",
+              "Smoke",
               "Snacks",
               "Desserts",
             ].map((cat) => (
@@ -328,6 +372,13 @@ export default function Cashier() {
                 typeof product.sizes === "string"
                   ? JSON.parse(product.sizes)
                   : product.sizes || [];
+
+              sizes = sizes.filter(
+                (s: any) =>
+                  s &&
+                  s.size &&
+                  s.size.trim() !== ""
+              );
 
             } catch {
 
@@ -421,7 +472,10 @@ export default function Cashier() {
 
                     <button
                       onClick={() =>
-                        addToCart(product)
+                        addToCart({
+                          ...product,
+                          price: product.price || 0
+                        })
                       }
                       className="
                         w-full

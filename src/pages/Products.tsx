@@ -24,7 +24,7 @@ export default function Products() {
     useState<Product[]>([]);
 
   const [category, setCategory] =
-    useState("Drinks");
+    useState("Ice");
 
   const [name, setName] = useState("");
 
@@ -78,7 +78,7 @@ export default function Products() {
 
     setName("");
     setStock("");
-    setCategory("Drinks");
+    setCategory("Ice");
 
     setSizes([
       {
@@ -140,21 +140,17 @@ export default function Products() {
             }
             className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
           >
-            <option value="Drinks">
-              Drinks
-            </option>
-
-            <option value="Food">
-              Food
-            </option>
-
-            <option value="Snacks">
-              Snacks
-            </option>
-
-            <option value="Desserts">
-              Desserts
-            </option>
+            <option value="Ice">Ice</option>
+            <option value="Natural">Natural</option>
+            <option value="Smoothie">Smoothie</option>
+            <option value="Milkeshake">Milkeshake</option>
+            <option value="Mojito">Mojito</option>
+            <option value="Hot">Hot</option>
+            <option value="Cocktail">Cocktail</option>
+            <option value="Healthy">Healthy</option>
+            <option value="Smoke">Smoke</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Desserts">Desserts</option>
           </select>
 
           {/* SIZES */}
