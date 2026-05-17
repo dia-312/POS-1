@@ -37,11 +37,18 @@ export async function initDB() {
     CREATE TABLE IF NOT EXISTS products (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      price REAL NOT NULL,
       stock INTEGER NOT NULL,
-      category TEXT
+      category TEXT,
+      sizes TEXT
     )
   `);
+
+  try {
+  await database.execute(`
+    ALTER TABLE products
+    ADD COLUMN sizes TEXT
+  `);
+} catch {}
 
   /* SALES */
 
@@ -138,20 +145,33 @@ export async function loginWithPin(
 export async function getProducts() {
   const database = await getDB();
 
-  return await database.select(`
-    SELECT *
-    FROM products
-    ORDER BY id DESC
-  `);
+  const products =
+    await database.select(`
+      SELECT *
+      FROM products
+      ORDER BY id DESC
+    `);
+
+  return products.map((product: any) => ({
+    ...product,
+    sizes: product.sizes
+      ? JSON.parse(product.sizes)
+      : [],
+  }));
 }
 
 export async function addProduct(
   name: string,
-  price: number,
   stock: number,
-  category: string
+  category: string,
+  sizes: any[]
 ) {
   const database = await getDB();
+
+  const firstPrice =
+    sizes.length > 0
+      ? Number(sizes[0].price)
+      : 0;
 
   await database.execute(
     `
@@ -159,21 +179,35 @@ export async function addProduct(
         name,
         price,
         stock,
-        category
+        category,
+        sizes
       )
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?)
     `,
-    [name, price, stock, category]
+    [
+      name,
+      firstPrice,
+      stock,
+      category,
+      JSON.stringify(sizes),
+    ]
   );
 }
 
 export async function updateProduct(
   id: number,
   name: string,
-  price: number,
-  stock: number
+  stock: number,
+  category: string,
+  sizes: any[]
 ) {
   const database = await getDB();
+
+  // احسب اول سعر من الاحجام
+  const firstPrice =
+    sizes.length > 0
+      ? Number(sizes[0].price)
+      : 0;
 
   await database.execute(
     `
@@ -181,10 +215,19 @@ export async function updateProduct(
       SET
         name = ?,
         price = ?,
-        stock = ?
+        stock = ?,
+        category = ?,
+        sizes = ?
       WHERE id = ?
     `,
-    [name, price, stock, id]
+    [
+      name,
+      firstPrice,
+      stock,
+      category,
+      JSON.stringify(sizes),
+      id,
+    ]
   );
 }
 

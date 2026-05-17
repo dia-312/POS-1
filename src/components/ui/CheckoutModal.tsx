@@ -25,7 +25,7 @@ export default function CheckoutModal({
         </p>
 
         <div className="text-4xl font-bold text-white mb-8">
-          ${total.toFixed(2)}
+          ₪{total.toFixed(2)}
         </div>
 
         <div className="flex gap-4">

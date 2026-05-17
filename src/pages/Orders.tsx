@@ -65,11 +65,11 @@ export default function Orders() {
               <div class="item">
                 <span>
                   ${item.name}
-                  x${item.quantity}
+                  ${item.quantity}
                 </span>
 
                 <span>
-                  $${(
+                  ₪${(
                     item.price *
                     item.quantity
                   ).toFixed(2)}
@@ -83,7 +83,7 @@ export default function Orders() {
 
         <div class="total">
           Total:
-          $${order.total.toFixed(2)}
+          ₪${order.total.toFixed(2)}
         </div>
       </body>
     </html>
@@ -189,7 +189,7 @@ export default function Orders() {
                   </td>
 
                   <td className="p-4 text-white font-semibold">
-                    ${order.total.toFixed(2)}
+                    ₪{order.total.toFixed(2)}
                   </td>
 
                   <td className="p-4">
@@ -264,13 +264,13 @@ export default function Orders() {
                     </p>
 
                     <p className="text-slate-400 text-sm">
-                      {item.quantity} x $
+                      {item.quantity} x ₪
                       {item.price}
                     </p>
                   </div>
 
                   <p className="text-white font-semibold">
-                    $
+                    ₪
                     {(
                       item.quantity * item.price
                     ).toFixed(2)}
@@ -283,7 +283,7 @@ export default function Orders() {
               <span>Total</span>
 
               <span>
-                ${currentOrder.total.toFixed(2)}
+                ₪{currentOrder.total.toFixed(2)}
               </span>
             </div>
 

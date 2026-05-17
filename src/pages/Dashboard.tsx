@@ -94,7 +94,7 @@ setStats({
           </p>
 
           <h2 className="text-4xl font-bold text-white">
-            ${Number(stats.revenue).toFixed(2)}
+            ₪{Number(stats.revenue).toFixed(2)}
           </h2>
         </div>
 

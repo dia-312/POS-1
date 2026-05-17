@@ -108,7 +108,7 @@ export default function Expenses() {
                 </td>
 
                 <td className="p-4 text-red-400">
-                  ${expense.amount}
+                   ₪{expense.amount}
                 </td>
 
                 <td className="p-4 text-slate-400">

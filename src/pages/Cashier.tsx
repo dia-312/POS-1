@@ -128,12 +128,13 @@ export default function Cashier() {
               (item) => `
                 <div class="item">
                   <span>
-                    ${item.name}
-                    x${item.quantity}
+                   ${item.name}
+                   ${item.selectedSize ? ` (${item.selectedSize})` : ""}
+                   x${item.quantity}
                   </span>
 
                   <span>
-                    $${(
+                    ₪${(
                       item.price *
                       item.quantity
                     ).toFixed(2)}
@@ -263,67 +264,124 @@ const loadProducts = async () => {
 
       {/* PRODUCTS GRID */}
 
-      <div className="
-        grid
-        grid-cols-2
-        xl:grid-cols-3
-        gap-5
-        overflow-auto
-        pr-2
-      ">
-        {filteredProducts.map((product) => (
-          <div
-            key={product.id}
-            className="
-              bg-slate-800
-              rounded-2xl
-              overflow-hidden
-              border border-slate-700
-              hover:border-blue-500
-              transition
-            "
-          >
-            <img
-              src={
-                product.image ||
-                "https://placehold.co/400x250?text=Product"
-              }
-              alt={product.name}
-              className="h-40 w-full object-cover"
-            />
+<div
+  className="
+    grid
+    grid-cols-2
+    xl:grid-cols-3
+    gap-5
+    overflow-auto
+    pr-2
+  "
+>
+  {filteredProducts.map((product) => {
 
-            <div className="p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-white text-lg font-semibold">
-                  {product.name}
-                </h2>
+    let sizes: any[] = [];
 
-                <span className="text-green-400 font-bold">
-                  ${product.price}
-                </span>
-              </div>
+    try {
+      sizes =
+        typeof product.sizes === "string"
+          ? JSON.parse(product.sizes)
+          : product.sizes || [];
+    } catch {
+      sizes = [];
+    }
 
-              <button
-                onClick={() =>
-                  addToCart(product)
-                }
-                className="
-                  w-full
-                  bg-blue-600
-                  hover:bg-blue-700
-                  text-white
-                  py-3
-                  rounded-xl
-                  font-semibold
-                  transition
-                "
-              >
-                Add To Cart
-              </button>
-            </div>
+    return (
+      <div
+        key={product.id}
+        className="
+          bg-slate-800
+          rounded-2xl
+          overflow-hidden
+          border border-slate-700
+          hover:border-blue-500
+          transition
+        "
+      >
+        <img
+          src={
+            product.image ||
+            "https://placehold.co/400x250?text=Product"
+          }
+          alt={product.name}
+          className="h-40 w-full object-cover"
+        />
+
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-white text-lg font-semibold">
+              {product.name}
+            </h2>
           </div>
-        ))}
+
+          {/* SIZES */}
+
+          {sizes.length > 0 ? (
+            <div className="space-y-2">
+              {sizes.map(
+                (
+                  size: any,
+                  index: number
+                ) => (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      addToCart({
+                        ...product,
+                        selectedSize:
+                          size.size,
+                        price:
+                          Number(size.price),
+                      })
+                    }
+                    className="
+                      w-full
+                      bg-blue-600
+                      hover:bg-blue-700
+                      text-white
+                      py-2
+                      rounded-xl
+                      flex
+                      justify-between
+                      px-4
+                    "
+                  >
+                    <span>
+                      {size.size}
+                    </span>
+
+                    <span>
+                       ₪{size.price}
+                    </span>
+                  </button>
+                )
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() =>
+                addToCart(product)
+              }
+              className="
+                w-full
+                bg-blue-600
+                hover:bg-blue-700
+                text-white
+                py-3
+                rounded-xl
+                font-semibold
+                transition
+              "
+            >
+              Add To Cart
+            </button>
+          )}
+        </div>
       </div>
+    );
+  })}
+</div>
     </div>
 
     {/* CART SECTION */}
@@ -362,14 +420,23 @@ const loadProducts = async () => {
             <div className="flex justify-between">
               <div>
                 <h3 className="text-white font-medium">
-                  {item.name}
+                 {item.name}
+
+                 {item.selectedSize && (
+                 <span className="text-sm text-slate-400 block">
+                   Size: {item.selectedSize}
+                  </span>
+                   )}
                 </h3>
 
                 <div className="flex items-center gap-2 mt-3">
 
                   <button
                     onClick={() =>
-                      decreaseQuantity(item.id)
+                     decreaseQuantity(
+                            item.id,
+                           item.selectedSize
+                             )
                     }
                     className="
                       w-7 h-7
@@ -387,7 +454,10 @@ const loadProducts = async () => {
 
                   <button
                     onClick={() =>
-                      increaseQuantity(item.id)
+                      increaseQuantity(
+                       item.id,
+                       item.selectedSize
+                      )
                     }
                     className="
                       w-7 h-7
@@ -403,7 +473,7 @@ const loadProducts = async () => {
 
               <div className="text-right">
                 <p className="text-white font-bold">
-                  $
+                   ₪
                   {(
                     item.price *
                     item.quantity
@@ -412,7 +482,10 @@ const loadProducts = async () => {
 
                 <button
                   onClick={() =>
-                    removeFromCart(item.id)
+                   removeFromCart(
+  item.id,
+  item.selectedSize
+)
                   }
                   className="
                     text-red-400
@@ -441,7 +514,7 @@ const loadProducts = async () => {
           </span>
 
           <span className="text-3xl font-bold text-white">
-            ${total.toFixed(2)}
+             ₪{total.toFixed(2)}
           </span>
         </div>
 
