@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useOrdersStore } from "../store/useOrdersStore";
 
 export default function Orders() {
+
   const { orders } = useOrdersStore();
 
   const [selectedOrder, setSelectedOrder] =
@@ -12,140 +13,196 @@ export default function Orders() {
   );
 
   const printReceipt = (order: any) => {
-  const receiptContent = `
-    <html>
-      <head>
-        <title>Receipt</title>
 
-        <style>
-          body {
-            font-family: Arial;
-            padding: 20px;
-            color: black;
-          }
+    const receiptContent = `
+      <html>
 
-          h1 {
-            text-align: center;
-          }
+        <head>
 
-          .item {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-          }
+          <title>Receipt</title>
 
-          .total {
-            margin-top: 20px;
-            font-size: 22px;
-            font-weight: bold;
-          }
-        </style>
-      </head>
+          <style>
 
-      <body>
-        <h1>POS RECEIPT</h1>
+            body {
+              font-family: Arial;
+              padding: 20px;
+              color: black;
+            }
 
-        <p>
-          <strong>Order ID:</strong>
-          #${order.id}
-        </p>
+            h1 {
+              text-align: center;
+            }
 
-        <p>
-          <strong>Date:</strong>
-          ${new Date(
-            order.createdAt
-          ).toLocaleString()}
-        </p>
+            .item {
+              margin: 10px 0;
+              border-bottom: 1px dashed #ccc;
+              padding-bottom: 8px;
+            }
 
-        <hr />
+            .row {
+              display: flex;
+              justify-content: space-between;
+            }
 
-        ${order.items
-          .map(
-            (item: any) => `
-              <div class="item">
-                <span>
-                  ${item.name}
-                  ${item.quantity}
-                </span>
+            .note {
+              font-size: 12px;
+              color: gray;
+              margin-top: 4px;
+            }
 
-                <span>
-                  ₪${(
-                    item.price *
-                    item.quantity
-                  ).toFixed(2)}
-                </span>
-              </div>
-            `
-          )
-          .join("")}
+            .total {
+              margin-top: 20px;
+              font-size: 22px;
+              font-weight: bold;
+            }
 
-        <hr />
+          </style>
 
-        <div class="total">
-          Total:
-          ₪${order.total.toFixed(2)}
-        </div>
-      </body>
-    </html>
-  `;
+        </head>
 
-  const printWindow =
-    document.createElement("iframe");
+        <body>
 
-  printWindow.style.position =
-    "fixed";
+          <h1>POS RECEIPT</h1>
 
-  printWindow.style.right = "0";
+          <p>
+            <strong>Order ID:</strong>
+            #${order.id}
+          </p>
 
-  printWindow.style.bottom = "0";
+          <p>
+            <strong>Date:</strong>
 
-  printWindow.style.width = "0";
+            ${new Date(
+              order.createdAt
+            ).toLocaleString()}
+          </p>
 
-  printWindow.style.height = "0";
+          <hr />
 
-  printWindow.style.border = "0";
+          ${order.items
+            .map(
+              (item: any) => `
+                <div class="item">
 
-  document.body.appendChild(
-    printWindow
-  );
+                  <div class="row">
 
-  const doc =
-    printWindow.contentWindow?.document;
+                    <span>
+                      ${item.name}
 
-  if (!doc) return;
+                      ${
+                        item.selectedSize
+                          ? ` (${item.selectedSize})`
+                          : ""
+                      }
 
-  doc.open();
+                      x${item.quantity}
+                    </span>
 
-  doc.write(receiptContent);
+                    <span>
+                      ₪${(
+                        item.price *
+                        item.quantity
+                      ).toFixed(2)}
+                    </span>
 
-  doc.close();
+                  </div>
 
-  printWindow.contentWindow?.focus();
+                  ${
+                    item.note
+                      ? `
+                        <div class="note">
+                          Note:
+                          ${item.note}
+                        </div>
+                      `
+                      : ""
+                  }
 
-  printWindow.contentWindow?.print();
+                </div>
+              `
+            )
+            .join("")}
 
-  setTimeout(() => {
-    document.body.removeChild(
+          <hr />
+
+          <div class="total">
+            Total:
+            ₪${order.total.toFixed(2)}
+          </div>
+
+        </body>
+
+      </html>
+    `;
+
+    const printWindow =
+      document.createElement("iframe");
+
+    printWindow.style.position =
+      "fixed";
+
+    printWindow.style.right = "0";
+
+    printWindow.style.bottom = "0";
+
+    printWindow.style.width = "0";
+
+    printWindow.style.height = "0";
+
+    printWindow.style.border = "0";
+
+    document.body.appendChild(
       printWindow
     );
-  }, 1000);
-};
+
+    const doc =
+      printWindow.contentWindow?.document;
+
+    if (!doc) return;
+
+    doc.open();
+
+    doc.write(receiptContent);
+
+    doc.close();
+
+    printWindow.contentWindow?.focus();
+
+    printWindow.contentWindow?.print();
+
+    setTimeout(() => {
+
+      document.body.removeChild(
+        printWindow
+      );
+
+    }, 1000);
+  };
 
   return (
+
     <div className="grid grid-cols-3 gap-6 h-full">
+
       {/* ORDERS TABLE */}
 
       <div className="col-span-2 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+
         <div className="p-6 border-b border-slate-700">
+
           <h1 className="text-3xl font-bold text-white">
             Orders
           </h1>
+
         </div>
 
         <div className="overflow-auto max-h-[80vh]">
+
           <table className="w-full">
+
             <thead className="bg-slate-900">
+
               <tr>
+
                 <th className="text-left p-4 text-slate-300">
                   Order ID
                 </th>
@@ -165,23 +222,30 @@ export default function Orders() {
                 <th className="text-left p-4 text-slate-300">
                   Action
                 </th>
+
               </tr>
+
             </thead>
 
             <tbody>
+
               {orders.map((order) => (
+
                 <tr
                   key={order.id}
                   className="border-b border-slate-700 hover:bg-slate-700 transition"
                 >
+
                   <td className="p-4 text-white">
                     #{order.id}
                   </td>
 
                   <td className="p-4 text-slate-300">
+
                     {new Date(
                       order.createdAt
                     ).toLocaleString()}
+
                   </td>
 
                   <td className="p-4 text-slate-300">
@@ -193,6 +257,7 @@ export default function Orders() {
                   </td>
 
                   <td className="p-4">
+
                     <button
                       onClick={() =>
                         setSelectedOrder(order.id)
@@ -201,36 +266,49 @@ export default function Orders() {
                     >
                       View
                     </button>
+
                   </td>
+
                 </tr>
               ))}
+
             </tbody>
+
           </table>
 
           {orders.length === 0 && (
+
             <div className="p-10 text-center text-slate-400">
               No Orders Yet
             </div>
+
           )}
+
         </div>
       </div>
 
       {/* RECEIPT */}
 
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 overflow-auto">
+
         <h2 className="text-3xl font-bold text-white mb-6">
           Receipt
         </h2>
 
         {!currentOrder && (
+
           <div className="text-slate-400">
             Select Order
           </div>
+
         )}
 
         {currentOrder && (
+
           <div>
+
             <div className="mb-6">
+
               <p className="text-slate-400 text-sm">
                 Order ID
               </p>
@@ -238,53 +316,92 @@ export default function Orders() {
               <p className="text-white text-lg font-semibold">
                 #{currentOrder.id}
               </p>
+
             </div>
 
             <div className="mb-6">
+
               <p className="text-slate-400 text-sm">
                 Date
               </p>
 
               <p className="text-white">
+
                 {new Date(
                   currentOrder.createdAt
                 ).toLocaleString()}
+
               </p>
+
             </div>
 
             <div className="space-y-4 mb-6">
-              {currentOrder.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between items-center"
-                >
+
+              {currentOrder.items.map(
+  (item: any, index: number) => (
+
+    <div
+      key={`${item.id}-${item.selectedSize || "default"}-${index}`}
+      className="flex justify-between items-start"
+    >
+
                   <div>
+
                     <p className="text-white font-medium">
+
                       {item.name}
+
+                      {item.selectedSize && (
+                        <span className="text-slate-400 text-sm ml-2">
+                          ({item.selectedSize})
+                        </span>
+                      )}
+
                     </p>
 
+                    {item.note && (
+
+                      <p className="text-yellow-400 text-xs mt-1">
+                        Note:
+                        {" "}
+                        {item.note}
+                      </p>
+
+                    )}
+
                     <p className="text-slate-400 text-sm">
-                      {item.quantity} x ₪
+
+                      {item.quantity}
+                      {" "}x ₪
                       {item.price}
+
                     </p>
+
                   </div>
 
                   <p className="text-white font-semibold">
+
                     ₪
                     {(
-                      item.quantity * item.price
+                      item.quantity *
+                      item.price
                     ).toFixed(2)}
+
                   </p>
+
                 </div>
               ))}
+
             </div>
 
             <div className="border-t border-slate-700 pt-4 flex justify-between text-2xl font-bold text-white">
+
               <span>Total</span>
 
               <span>
                 ₪{currentOrder.total.toFixed(2)}
               </span>
+
             </div>
 
             <button
@@ -295,9 +412,12 @@ export default function Orders() {
             >
               Print Receipt
             </button>
+
           </div>
         )}
+
       </div>
+
     </div>
   );
 }

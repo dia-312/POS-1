@@ -11,6 +11,8 @@ type Product = {
 
 type CartItem = Product & {
   quantity: number;
+  selectedSize?: string;
+  note?: string;
 };
 
 type CartStore = {
@@ -33,6 +35,12 @@ type CartStore = {
   removeFromCart: (
     id: number,
     selectedSize?: string
+  ) => void;
+
+  updateNote: (
+    id: number,
+    selectedSize: string | undefined,
+    note: string
   ) => void;
 
   clearCart: () => void;
@@ -77,6 +85,7 @@ export const useCartStore =
             {
               ...product,
               quantity: 1,
+              note: "",
             },
           ],
         };
@@ -136,6 +145,25 @@ export const useCartStore =
               item.selectedSize ===
                 selectedSize
             )
+        ),
+      })),
+
+    updateNote: (
+      id,
+      selectedSize,
+      note
+    ) =>
+      set((state) => ({
+        cart: state.cart.map(
+          (item) =>
+            item.id === id &&
+            item.selectedSize ===
+              selectedSize
+              ? {
+                  ...item,
+                  note,
+                }
+              : item
         ),
       })),
 
