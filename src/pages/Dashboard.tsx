@@ -81,39 +81,39 @@ setStats({
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6">
+      <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
         Dashboard
       </h1>
 
       {/* STATS */}
 
       <div className="grid grid-cols-3 gap-6 mb-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-          <p className="text-slate-400 mb-2">
+        <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
+          <p className="text-stone-500 dark:text-stone-400 mb-2">
             Revenue
           </p>
 
-          <h2 className="text-4xl font-bold text-white">
+          <h2 className="text-4xl font-bold text-stone-900 dark:text-white">
             ₪{Number(stats.revenue).toFixed(2)}
           </h2>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-          <p className="text-slate-400 mb-2">
+        <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
+          <p className="text-stone-500 dark:text-stone-400 mb-2">
             Orders
           </p>
 
-          <h2 className="text-4xl font-bold text-white">
+          <h2 className="text-4xl font-bold text-stone-900 dark:text-white">
             {stats.orders}
           </h2>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-          <p className="text-slate-400 mb-2">
+        <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
+          <p className="text-stone-500 dark:text-stone-400 mb-2">
             Products
           </p>
 
-          <h2 className="text-4xl font-bold text-white">
+          <h2 className="text-4xl font-bold text-stone-900 dark:text-white">
             {stats.products}
           </h2>
         </div>
@@ -121,8 +121,8 @@ setStats({
 
       {/* CHART */}
 
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">
+      <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
+        <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-6">
           Sales Analytics
         </h2>
 
@@ -150,8 +150,8 @@ setStats({
       </div>
 
 
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 mt-6">
-  <h2 className="text-2xl font-bold text-white mb-6">
+      <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6 mt-6">
+  <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-6">
     Low Stock Alerts
   </h2>
 
@@ -159,14 +159,14 @@ setStats({
     {lowStock.map((product) => (
       <div
         key={product.id}
-        className="bg-slate-900 p-4 rounded-xl flex justify-between"
+        className="bg-stone-50 dark:bg-stone-900 p-4 rounded-xl flex justify-between"
       >
         <div>
-          <p className="text-white font-semibold">
+          <p className="text-stone-900 dark:text-white font-semibold">
             {product.name}
           </p>
 
-          <p className="text-slate-400">
+          <p className="text-stone-500 dark:text-stone-400">
             Product ID: {product.id}
           </p>
         </div>
@@ -178,7 +178,7 @@ setStats({
     ))}
 
     {lowStock.length === 0 && (
-      <p className="text-slate-400">
+      <p className="text-stone-500 dark:text-stone-400">
         No Low Stock Alerts
       </p>
     )}

@@ -62,9 +62,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="w-64 bg-slate-950 border-r border-slate-800 p-4 flex flex-col">
+    <div className="w-64 bg-stone-100 dark:bg-stone-950 border-r border-stone-200 dark:border-stone-800 p-4 flex flex-col">
       <div>
-        <h1 className="text-white text-2xl font-bold mb-10">
+        <h1 className="text-stone-900 dark:text-white text-2xl font-bold mb-10">
           POS SYSTEM
         </h1>
 
@@ -78,8 +78,8 @@ export default function Sidebar() {
               }) =>
                 `px-4 py-3 rounded-xl transition ${
                   isActive
-                    ? "bg-blue-600 text-white"
-                    : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                    ? "bg-amber-600 text-stone-900 dark:text-white"
+                    : "text-stone-600 dark:text-stone-300 hover:bg-white dark:bg-stone-800 hover:text-stone-900 dark:hover:text-stone-900 dark:text-white"
                 }`
               }
             >

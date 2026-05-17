@@ -282,7 +282,7 @@ export default function Cashier() {
 
         <div className="mb-6">
 
-          <h1 className="text-3xl font-bold text-white mb-4">
+          <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-4">
             Cashier
           </h1>
 
@@ -297,11 +297,11 @@ export default function Cashier() {
             }
             className="
               w-full
-              bg-slate-800
-              border border-slate-700
+              bg-white dark:bg-stone-800
+              border border-stone-200 dark:border-stone-700
               rounded-2xl
               px-5 py-4
-              text-white
+              text-stone-900 dark:text-white
               outline-none
               text-lg
             "
@@ -337,8 +337,8 @@ export default function Cashier() {
                   font-medium
                   ${
                     selectedCategory === cat
-                      ? "bg-blue-600 text-white"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      ? "bg-amber-600 text-stone-900 dark:text-white"
+                      : "bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:bg-stone-700"
                   }
                 `}
               >
@@ -390,11 +390,11 @@ export default function Cashier() {
               <div
                 key={product.id}
                 className="
-                  bg-slate-800
+                  bg-white dark:bg-stone-800
                   rounded-2xl
                   overflow-hidden
-                  border border-slate-700
-                  hover:border-blue-500
+                  border border-stone-200 dark:border-stone-700
+                  hover:border-amber-500
                   transition
                 "
               >
@@ -412,7 +412,7 @@ export default function Cashier() {
 
                   <div className="flex justify-between items-center mb-4">
 
-                    <h2 className="text-white text-lg font-semibold">
+                    <h2 className="text-stone-900 dark:text-white text-lg font-semibold">
                       {product.name}
                     </h2>
 
@@ -443,9 +443,9 @@ export default function Cashier() {
                             }
                             className="
                               w-full
-                              bg-blue-600
-                              hover:bg-blue-700
-                              text-white
+                              bg-amber-600
+                              hover:bg-amber-700
+                              text-stone-900 dark:text-white
                               py-2
                               rounded-xl
                               flex
@@ -479,9 +479,9 @@ export default function Cashier() {
                       }
                       className="
                         w-full
-                        bg-blue-600
-                        hover:bg-blue-700
-                        text-white
+                        bg-amber-600
+                        hover:bg-amber-700
+                        text-stone-900 dark:text-white
                         py-3
                         rounded-xl
                         font-semibold
@@ -504,8 +504,8 @@ export default function Cashier() {
       <div
         className="
           w-[340px]
-          bg-slate-900
-          border border-slate-800
+          bg-stone-50 dark:bg-stone-900
+          border border-stone-200 dark:border-stone-800
           rounded-2xl
           p-5
           flex flex-col
@@ -514,11 +514,11 @@ export default function Cashier() {
 
         <div className="mb-5">
 
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-stone-900 dark:text-white">
             Current Order
           </h2>
 
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">
             {cart.length} Items
           </p>
 
@@ -533,7 +533,7 @@ export default function Cashier() {
             <div
               key={`${item.id}-${item.selectedSize}`}
               className="
-                bg-slate-800
+                bg-white dark:bg-stone-800
                 rounded-xl
                 p-3
               "
@@ -543,12 +543,12 @@ export default function Cashier() {
 
                 <div className="flex-1">
 
-                  <h3 className="text-white font-medium">
+                  <h3 className="text-stone-900 dark:text-white font-medium">
 
                     {item.name}
 
                     {item.selectedSize && (
-                      <span className="text-sm text-slate-400 block">
+                      <span className="text-sm text-stone-500 dark:text-stone-400 block">
                         Size:
                         {" "}
                         {item.selectedSize}
@@ -572,8 +572,8 @@ export default function Cashier() {
                     className="
                       mt-2
                       w-full
-                      bg-slate-700
-                      text-white
+                      bg-stone-100 dark:bg-stone-700
+                      text-stone-900 dark:text-white
                       text-sm
                       rounded-lg
                       p-2
@@ -594,14 +594,14 @@ export default function Cashier() {
                       className="
                         w-7 h-7
                         rounded-lg
-                        bg-slate-700
-                        text-white
+                        bg-stone-100 dark:bg-stone-700
+                        text-stone-900 dark:text-white
                       "
                     >
                       -
                     </button>
 
-                    <span className="text-white w-5 text-center">
+                    <span className="text-stone-900 dark:text-white w-5 text-center">
                       {item.quantity}
                     </span>
 
@@ -615,8 +615,8 @@ export default function Cashier() {
                       className="
                         w-7 h-7
                         rounded-lg
-                        bg-slate-700
-                        text-white
+                        bg-stone-100 dark:bg-stone-700
+                        text-stone-900 dark:text-white
                       "
                     >
                       +
@@ -627,7 +627,7 @@ export default function Cashier() {
 
                 <div className="text-right ml-4">
 
-                  <p className="text-white font-bold">
+                  <p className="text-stone-900 dark:text-white font-bold">
                     ₪
                     {(
                       item.price *
@@ -663,18 +663,18 @@ export default function Cashier() {
 
         <div
           className="
-            border-t border-slate-700
+            border-t border-stone-200 dark:border-stone-700
             pt-5 mt-5
           "
         >
 
           <div className="flex justify-between items-center mb-5">
 
-            <span className="text-slate-300 text-lg">
+            <span className="text-stone-600 dark:text-stone-300 text-lg">
               Total
             </span>
 
-            <span className="text-3xl font-bold text-white">
+            <span className="text-3xl font-bold text-stone-900 dark:text-white">
               ₪{total.toFixed(2)}
             </span>
 
@@ -688,7 +688,7 @@ export default function Cashier() {
               w-full
               bg-green-600
               hover:bg-green-700
-              text-white
+              text-stone-900 dark:text-white
               py-4
               rounded-2xl
               text-lg

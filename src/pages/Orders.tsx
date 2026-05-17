@@ -185,11 +185,11 @@ export default function Orders() {
 
       {/* ORDERS TABLE */}
 
-      <div className="col-span-2 bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+      <div className="col-span-2 bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden">
 
-        <div className="p-6 border-b border-slate-700">
+        <div className="p-6 border-b border-stone-200 dark:border-stone-700">
 
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">
             Orders
           </h1>
 
@@ -199,27 +199,27 @@ export default function Orders() {
 
           <table className="w-full">
 
-            <thead className="bg-slate-900">
+            <thead className="bg-stone-50 dark:bg-stone-900">
 
               <tr>
 
-                <th className="text-left p-4 text-slate-300">
+                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                   Order ID
                 </th>
 
-                <th className="text-left p-4 text-slate-300">
+                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                   Date
                 </th>
 
-                <th className="text-left p-4 text-slate-300">
+                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                   Items
                 </th>
 
-                <th className="text-left p-4 text-slate-300">
+                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                   Total
                 </th>
 
-                <th className="text-left p-4 text-slate-300">
+                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                   Action
                 </th>
 
@@ -233,14 +233,14 @@ export default function Orders() {
 
                 <tr
                   key={order.id}
-                  className="border-b border-slate-700 hover:bg-slate-700 transition"
+                  className="border-b border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:bg-stone-700 transition"
                 >
 
-                  <td className="p-4 text-white">
+                  <td className="p-4 text-stone-900 dark:text-white">
                     #{order.id}
                   </td>
 
-                  <td className="p-4 text-slate-300">
+                  <td className="p-4 text-stone-600 dark:text-stone-300">
 
                     {new Date(
                       order.createdAt
@@ -248,11 +248,11 @@ export default function Orders() {
 
                   </td>
 
-                  <td className="p-4 text-slate-300">
+                  <td className="p-4 text-stone-600 dark:text-stone-300">
                     {order.items.length}
                   </td>
 
-                  <td className="p-4 text-white font-semibold">
+                  <td className="p-4 text-stone-900 dark:text-white font-semibold">
                     ₪{order.total.toFixed(2)}
                   </td>
 
@@ -262,7 +262,7 @@ export default function Orders() {
                       onClick={() =>
                         setSelectedOrder(order.id)
                       }
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                      className="bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                     >
                       View
                     </button>
@@ -278,7 +278,7 @@ export default function Orders() {
 
           {orders.length === 0 && (
 
-            <div className="p-10 text-center text-slate-400">
+            <div className="p-10 text-center text-stone-500 dark:text-stone-400">
               No Orders Yet
             </div>
 
@@ -289,15 +289,15 @@ export default function Orders() {
 
       {/* RECEIPT */}
 
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 overflow-auto">
+      <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-6 overflow-auto">
 
-        <h2 className="text-3xl font-bold text-white mb-6">
+        <h2 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
           Receipt
         </h2>
 
         {!currentOrder && (
 
-          <div className="text-slate-400">
+          <div className="text-stone-500 dark:text-stone-400">
             Select Order
           </div>
 
@@ -309,11 +309,11 @@ export default function Orders() {
 
             <div className="mb-6">
 
-              <p className="text-slate-400 text-sm">
+              <p className="text-stone-500 dark:text-stone-400 text-sm">
                 Order ID
               </p>
 
-              <p className="text-white text-lg font-semibold">
+              <p className="text-stone-900 dark:text-white text-lg font-semibold">
                 #{currentOrder.id}
               </p>
 
@@ -321,11 +321,11 @@ export default function Orders() {
 
             <div className="mb-6">
 
-              <p className="text-slate-400 text-sm">
+              <p className="text-stone-500 dark:text-stone-400 text-sm">
                 Date
               </p>
 
-              <p className="text-white">
+              <p className="text-stone-900 dark:text-white">
 
                 {new Date(
                   currentOrder.createdAt
@@ -347,12 +347,12 @@ export default function Orders() {
 
                   <div>
 
-                    <p className="text-white font-medium">
+                    <p className="text-stone-900 dark:text-white font-medium">
 
                       {item.name}
 
                       {item.selectedSize && (
-                        <span className="text-slate-400 text-sm ml-2">
+                        <span className="text-stone-500 dark:text-stone-400 text-sm ml-2">
                           ({item.selectedSize})
                         </span>
                       )}
@@ -369,7 +369,7 @@ export default function Orders() {
 
                     )}
 
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-stone-500 dark:text-stone-400 text-sm">
 
                       {item.quantity}
                       {" "}x ₪
@@ -379,7 +379,7 @@ export default function Orders() {
 
                   </div>
 
-                  <p className="text-white font-semibold">
+                  <p className="text-stone-900 dark:text-white font-semibold">
 
                     ₪
                     {(
@@ -394,7 +394,7 @@ export default function Orders() {
 
             </div>
 
-            <div className="border-t border-slate-700 pt-4 flex justify-between text-2xl font-bold text-white">
+            <div className="border-t border-stone-200 dark:border-stone-700 pt-4 flex justify-between text-2xl font-bold text-stone-900 dark:text-white">
 
               <span>Total</span>
 
@@ -408,7 +408,7 @@ export default function Orders() {
               onClick={() =>
                 printReceipt(currentOrder)
               }
-              className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold"
+              className="w-full mt-6 bg-green-600 hover:bg-green-700 text-stone-900 dark:text-white py-3 rounded-lg font-semibold"
             >
               Print Receipt
             </button>

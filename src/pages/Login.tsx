@@ -62,9 +62,9 @@ export default function Login() {
     };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-slate-950">
-      <div className="bg-slate-900 p-8 rounded-2xl w-96 border border-slate-800">
-        <h1 className="text-white text-3xl mb-6 font-bold">
+    <div className="h-screen flex items-center justify-center bg-stone-100 dark:bg-stone-950">
+      <div className="bg-stone-50 dark:bg-stone-900 p-8 rounded-2xl w-96 border border-stone-200 dark:border-stone-800">
+        <h1 className="text-stone-900 dark:text-white text-3xl mb-6 font-bold">
           POS Login
         </h1>
 
@@ -73,7 +73,7 @@ export default function Login() {
         <input
           placeholder="Username"
           value={username}
-          className="w-full mb-3 p-3 rounded bg-slate-800 text-white"
+          className="w-full mb-3 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
           onChange={(e) =>
             setUsername(
               e.target.value
@@ -87,7 +87,7 @@ export default function Login() {
           type="password"
           placeholder="Password"
           value={password}
-          className="w-full mb-5 p-3 rounded bg-slate-800 text-white"
+          className="w-full mb-5 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
           onChange={(e) =>
             setPassword(
               e.target.value
@@ -99,15 +99,15 @@ export default function Login() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded"
+          className="w-full bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white p-3 rounded"
         >
           Login
         </button>
 
         {/* PIN LOGIN */}
 
-        <div className="mt-6 border-t border-slate-700 pt-6">
-          <h2 className="text-white mb-3">
+        <div className="mt-6 border-t border-stone-200 dark:border-stone-700 pt-6">
+          <h2 className="text-stone-900 dark:text-white mb-3">
             Quick PIN Login
           </h2>
 
@@ -117,14 +117,14 @@ export default function Login() {
             onChange={(e) =>
               setPin(e.target.value)
             }
-            className="w-full mb-3 p-3 rounded bg-slate-800 text-white"
+            className="w-full mb-3 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
           />
 
           <button
             onClick={
               handlePinLogin
             }
-            className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded"
+            className="w-full bg-green-600 hover:bg-green-700 text-stone-900 dark:text-white p-3 rounded"
           >
             Login With PIN
           </button>

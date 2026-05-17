@@ -59,13 +59,13 @@ export default function Users() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6">
+      <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
         Users
       </h1>
 
       {/* FORM */}
 
-      <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 mb-6">
+      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl border border-stone-200 dark:border-stone-700 mb-6">
         <div className="grid grid-cols-3 gap-4">
           <input
             value={username}
@@ -73,7 +73,7 @@ export default function Users() {
               setUsername(e.target.value)
             }
             placeholder="Username"
-            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
           <input
@@ -82,7 +82,7 @@ export default function Users() {
               setPassword(e.target.value)
             }
             placeholder="Password"
-            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
           <select
@@ -90,7 +90,7 @@ export default function Users() {
             onChange={(e) =>
               setRole(e.target.value)
             }
-            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           >
             <option value="cashier">
               Cashier
@@ -104,7 +104,7 @@ export default function Users() {
 
         <button
           onClick={handleAddUser}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+          className="mt-4 bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
         >
           Add User
         </button>
@@ -112,23 +112,23 @@ export default function Users() {
 
       {/* TABLE */}
 
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+      <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden">
         <table className="w-full">
-          <thead className="bg-slate-900">
+          <thead className="bg-stone-50 dark:bg-stone-900">
             <tr>
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 ID
               </th>
 
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 Username
               </th>
 
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 Role
               </th>
 
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 Action
               </th>
             </tr>
@@ -138,17 +138,17 @@ export default function Users() {
             {users.map((user) => (
               <tr
                 key={user.id}
-                className="border-b border-slate-700"
+                className="border-b border-stone-200 dark:border-stone-700"
               >
-                <td className="p-4 text-white">
+                <td className="p-4 text-stone-900 dark:text-white">
                   {user.id}
                 </td>
 
-                <td className="p-4 text-white">
+                <td className="p-4 text-stone-900 dark:text-white">
                   {user.username}
                 </td>
 
-                <td className="p-4 text-white">
+                <td className="p-4 text-stone-900 dark:text-white">
                   {user.role}
                 </td>
 
@@ -158,7 +158,7 @@ export default function Users() {
                     onClick={() =>
                       handleDelete(user.id)
                     }
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                    className="bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
                     Delete
                   </button>

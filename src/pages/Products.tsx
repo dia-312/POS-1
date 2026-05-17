@@ -104,13 +104,13 @@ export default function Products() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6">
+      <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
         Products
       </h1>
 
       {/* FORM */}
 
-      <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 mb-6">
+      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl border border-stone-200 dark:border-stone-700 mb-6">
         <div className="grid grid-cols-1 gap-4">
           <input
             value={name}
@@ -118,7 +118,7 @@ export default function Products() {
               setName(e.target.value)
             }
             placeholder="Product Name"
-            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
           <input
@@ -128,7 +128,7 @@ export default function Products() {
             }
             placeholder="Stock"
             type="number"
-            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
           <select
@@ -138,7 +138,7 @@ export default function Products() {
                 e.target.value
               )
             }
-            className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           >
             <option value="Ice">Ice</option>
             <option value="Natural">Natural</option>
@@ -156,7 +156,7 @@ export default function Products() {
           {/* SIZES */}
 
           <div className="space-y-3">
-            <h3 className="text-white font-semibold">
+            <h3 className="text-stone-900 dark:text-white font-semibold">
               Sizes & Prices
             </h3>
 
@@ -183,7 +183,7 @@ export default function Products() {
                         updated
                       );
                     }}
-                    className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+                    className="flex-1 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
                   />
 
                   <input
@@ -204,7 +204,7 @@ export default function Products() {
                         updated
                       );
                     }}
-                    className="w-40 bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+                    className="w-40 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
                   />
                 </div>
               )
@@ -221,7 +221,7 @@ export default function Products() {
                   },
                 ])
               }
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+              className="bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
             >
               Add Size
             </button>
@@ -230,7 +230,7 @@ export default function Products() {
 
         <button
           onClick={handleAddProduct}
-          className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+          className="mt-6 bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
         >
           {editingId
             ? "Update Product"
@@ -240,27 +240,27 @@ export default function Products() {
 
       {/* TABLE */}
 
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+      <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden">
         <table className="w-full">
-          <thead className="bg-slate-900">
+          <thead className="bg-stone-50 dark:bg-stone-900">
             <tr>
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 ID
               </th>
 
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 Name
               </th>
 
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 Sizes
               </th>
 
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 Stock
               </th>
 
-              <th className="text-left p-4 text-slate-300">
+              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
                 Action
               </th>
             </tr>
@@ -270,17 +270,17 @@ export default function Products() {
             {products.map((product) => (
               <tr
                 key={product.id}
-                className="border-b border-slate-700"
+                className="border-b border-stone-200 dark:border-stone-700"
               >
-                <td className="p-4 text-white">
+                <td className="p-4 text-stone-900 dark:text-white">
                   {product.id}
                 </td>
 
-                <td className="p-4 text-white">
+                <td className="p-4 text-stone-900 dark:text-white">
                   {product.name}
                 </td>
 
-                <td className="p-4 text-white">
+                <td className="p-4 text-stone-900 dark:text-white">
                   <div className="space-y-1">
                     {product.sizes?.map(
                       (
@@ -303,7 +303,7 @@ export default function Products() {
                   </div>
                 </td>
 
-                <td className="p-4 text-white">
+                <td className="p-4 text-stone-900 dark:text-white">
                   {product.stock}
                 </td>
 
@@ -314,7 +314,7 @@ export default function Products() {
                         product.id
                       )
                     }
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                    className="bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
                     Delete
                   </button>
@@ -347,7 +347,7 @@ export default function Products() {
                         )
                       );
                     }}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg"
+                    className="bg-yellow-600 hover:bg-yellow-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
                     Edit
                   </button>
