@@ -355,8 +355,10 @@ export default function Cashier() {
           className="
             grid
             grid-cols-2
-            xl:grid-cols-3
-            gap-5
+            md:grid-cols-3
+            lg:grid-cols-4
+            xl:grid-cols-5
+            gap-4
             overflow-auto
             pr-2
           "
@@ -392,107 +394,101 @@ export default function Cashier() {
                 className="
                   bg-white dark:bg-stone-800
                   rounded-2xl
-                  overflow-hidden
                   border border-stone-200 dark:border-stone-700
                   hover:border-amber-500
                   transition
+                  p-4
+                  flex flex-col
+                  h-full
                 "
               >
 
-                <img
-                  src={
-                    product.image ||
-                    "https://placehold.co/400x250?text=Product"
-                  }
-                  alt={product.name}
-                  className="h-40 w-full object-cover"
-                />
+                <div className="mb-4 flex-grow">
+                  <h2 className="text-stone-900 dark:text-white text-base font-semibold leading-snug break-words">
+                    {product.name}
+                  </h2>
+                  <p className="text-stone-500 dark:text-stone-400 text-xs mt-1">
+                    {product.category}
+                  </p>
+                </div>
 
-                <div className="p-4">
+                {/* SIZES */}
 
-                  <div className="flex justify-between items-center mb-4">
+                {sizes.length > 0 ? (
 
-                    <h2 className="text-stone-900 dark:text-white text-lg font-semibold">
-                      {product.name}
-                    </h2>
+                  <div className="flex flex-col gap-2 mt-auto">
+
+                    {sizes.map(
+                      (
+                        size: any,
+                        index: number
+                      ) => (
+
+                        <button
+                          key={index}
+                          onClick={() =>
+                            addToCart({
+                              ...product,
+                              selectedSize:
+                                size.size,
+                              price:
+                                Number(size.price),
+                            })
+                          }
+                          className="
+                            w-full
+                            bg-amber-600
+                            hover:bg-amber-700
+                            text-white
+                            py-2
+                            rounded-xl
+                            flex
+                            justify-between
+                            items-center
+                            px-4
+                            transition
+                          "
+                        >
+
+                          <span className="font-medium text-sm">
+                            {size.size}
+                          </span>
+
+                          <span className="font-bold">
+                            ₪{size.price}
+                          </span>
+
+                        </button>
+                      )
+                    )}
 
                   </div>
 
-                  {/* SIZES */}
+                ) : (
 
-                  {sizes.length > 0 ? (
+                  <button
+                    onClick={() =>
+                      addToCart({
+                        ...product,
+                        price: product.price || 0
+                      })
+                    }
+                    className="
+                      mt-auto
+                      w-full
+                      bg-amber-600
+                      hover:bg-amber-700
+                      text-white
+                      py-2.5
+                      rounded-xl
+                      font-semibold
+                      transition
+                    "
+                  >
+                    Add To Cart
+                  </button>
+                )}
 
-                    <div className="space-y-2">
-
-                      {sizes.map(
-                        (
-                          size: any,
-                          index: number
-                        ) => (
-
-                          <button
-                            key={index}
-                            onClick={() =>
-                              addToCart({
-                                ...product,
-                                selectedSize:
-                                  size.size,
-                                price:
-                                  Number(size.price),
-                              })
-                            }
-                            className="
-                              w-full
-                              bg-amber-600
-                              hover:bg-amber-700
-                              text-stone-900 dark:text-white
-                              py-2
-                              rounded-xl
-                              flex
-                              justify-between
-                              px-4
-                            "
-                          >
-
-                            <span>
-                              {size.size}
-                            </span>
-
-                            <span>
-                              ₪{size.price}
-                            </span>
-
-                          </button>
-                        )
-                      )}
-
-                    </div>
-
-                  ) : (
-
-                    <button
-                      onClick={() =>
-                        addToCart({
-                          ...product,
-                          price: product.price || 0
-                        })
-                      }
-                      className="
-                        w-full
-                        bg-amber-600
-                        hover:bg-amber-700
-                        text-stone-900 dark:text-white
-                        py-3
-                        rounded-xl
-                        font-semibold
-                        transition
-                      "
-                    >
-                      Add To Cart
-                    </button>
-                  )}
-
-                </div>
               </div>
             );
           })}
