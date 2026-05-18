@@ -160,28 +160,15 @@ export default function Products() {
               Sizes & Prices
             </h3>
 
-            {sizes.map(
-              (item, index) => (
-                <div
-                  key={index}
-                  className="flex gap-3"
-                >
+            {sizes.map((item, index) => (
+                <div key={index} className="flex gap-3 items-center">
                   <input
                     placeholder="Size"
                     value={item.size}
                     onChange={(e) => {
-                      const updated = [
-                        ...sizes,
-                      ];
-
-                      updated[
-                        index
-                      ].size =
-                        e.target.value;
-
-                      setSizes(
-                        updated
-                      );
+                      const updated = [...sizes];
+                      updated[index].size = e.target.value;
+                      setSizes(updated);
                     }}
                     className="flex-1 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
                   />
@@ -191,24 +178,28 @@ export default function Products() {
                     placeholder="Price"
                     value={item.price}
                     onChange={(e) => {
-                      const updated = [
-                        ...sizes,
-                      ];
-
-                      updated[
-                        index
-                      ].price =
-                        e.target.value;
-
-                      setSizes(
-                        updated
-                      );
+                      const updated = [...sizes];
+                      updated[index].price = e.target.value;
+                      setSizes(updated);
                     }}
                     className="w-40 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
                   />
+
+                  {sizes.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = sizes.filter((_, i) => i !== index);
+                        setSizes(updated);
+                      }}
+                      className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-lg transition-colors flex items-center justify-center"
+                      title="Remove Size"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
+                  )}
                 </div>
-              )
-            )}
+              ))}
 
             <button
               type="button"
