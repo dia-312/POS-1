@@ -8,6 +8,7 @@ import AppRoutes from "./routes/AppRoutes";
 
 import { initDB } from "./lib/database";
 import { useThemeStore } from "./store/useThemeStore";
+import { performAutomaticBackup } from "./lib/backup";
 
 function App() {
   const location = useLocation();
@@ -15,7 +16,15 @@ function App() {
   const initTheme = useThemeStore((s) => s.initTheme);
 
   useEffect(() => {
-    initDB();
+    initDB().then(() => {
+      // Automatic backup on startup
+      performAutomaticBackup();
+      
+      // Automatic backup every hour to capture End of Day state
+      setInterval(() => {
+        performAutomaticBackup();
+      }, 60 * 60 * 1000);
+    });
     initTheme();
   }, [initTheme]);
 

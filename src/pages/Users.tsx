@@ -23,6 +23,9 @@ export default function Users() {
   const [password, setPassword] =
     useState("");
 
+  const [pin, setPin] =
+    useState("");
+
   const [role, setRole] =
     useState("cashier");
 
@@ -38,11 +41,13 @@ export default function Users() {
     await addUser(
       username,
       password,
-      role
+      role,
+      pin || "0000"
     );
 
     setUsername("");
     setPassword("");
+    setPin("");
 
     loadUsers();
   }
@@ -82,6 +87,15 @@ export default function Users() {
               setPassword(e.target.value)
             }
             placeholder="Password"
+            className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
+          />
+
+          <input
+            value={pin}
+            onChange={(e) =>
+              setPin(e.target.value)
+            }
+            placeholder="PIN Code"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 

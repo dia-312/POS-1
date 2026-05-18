@@ -438,3 +438,70 @@ export async function deleteSale(id: number) {
 
   await database.execute(`DELETE FROM sales WHERE id=?`, [id]);
 }
+
+/* EXPORT / IMPORT BACKUP */
+export async function exportDatabase() {
+  const database = await getDB();
+
+  const users = await database.select(`SELECT * FROM users`);
+  const products = await database.select(`SELECT * FROM products`);
+  const sales = await database.select(`SELECT * FROM sales`);
+  const expenses = await database.select(`SELECT * FROM expenses`);
+
+  const ordersStorage = localStorage.getItem("orders-storage");
+  const parsedOrders = ordersStorage ? JSON.parse(ordersStorage) : null;
+
+  return JSON.stringify({ users, products, sales, expenses, ordersState: parsedOrders });
+}
+
+export async function importDatabase(jsonString: string) {
+  const database = await getDB();
+  const data = JSON.parse(jsonString);
+
+  if (!data.users || !data.products || !data.sales || !data.expenses) {
+    throw new Error("Invalid backup file format");
+  }
+
+  // Clear existing data
+  await database.execute(`DELETE FROM users`);
+  await database.execute(`DELETE FROM products`);
+  await database.execute(`DELETE FROM sales`);
+  await database.execute(`DELETE FROM expenses`);
+
+  // Insert users
+  for (const u of data.users) {
+    await database.execute(
+      `INSERT INTO users (id, username, password, role, pin) VALUES (?, ?, ?, ?, ?)`,
+      [u.id, u.username, u.password, u.role, u.pin]
+    );
+  }
+
+  // Insert products
+  for (const p of data.products) {
+    await database.execute(
+      `INSERT INTO products (id, name, stock, category, sizes, price) VALUES (?, ?, ?, ?, ?, ?)`,
+      [p.id, p.name, p.stock, p.category, p.sizes, p.price]
+    );
+  }
+
+  // Insert sales
+  for (const s of data.sales) {
+    await database.execute(
+      `INSERT INTO sales (id, total, created_at) VALUES (?, ?, ?)`,
+      [s.id, s.total, s.created_at]
+    );
+  }
+
+  // Insert expenses
+  for (const e of data.expenses) {
+    await database.execute(
+      `INSERT INTO expenses (id, title, amount, created_at) VALUES (?, ?, ?, ?)`,
+      [e.id, e.title, e.amount, e.created_at]
+    );
+  }
+
+  // Restore orders state to local storage
+  if (data.ordersState) {
+    localStorage.setItem("orders-storage", JSON.stringify(data.ordersState));
+  }
+}

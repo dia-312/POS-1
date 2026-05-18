@@ -9,13 +9,15 @@
 
   "permissions": [
     "core:default",
-
     "sql:default",
-
     "sql:allow-load",
-
     "sql:allow-execute",
-
-    "sql:allow-select"
+    "sql:allow-select",
+    "dialog:default",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "fs:default",
+    "fs:allow-document-read-recursive",
+    "fs:allow-document-write-recursive"
   ]
 }
