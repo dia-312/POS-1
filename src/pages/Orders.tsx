@@ -203,7 +203,7 @@ export default function Orders() {
               ))}
             </div>
 
-            <div className="border-t border-stone-200 dark:border-stone-800 pt-4 mt-auto space-y-2">
+            <div className="border-t border-stone-200 dark:border-stone-800 pt-4 mt-4 space-y-2">
               <div className="flex justify-between text-sm text-stone-600 dark:text-stone-400">
                 <span>Subtotal:</span>
                 <span>₪{(currentOrder.subtotal || currentOrder.items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0)).toFixed(2)}</span>

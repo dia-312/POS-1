@@ -298,42 +298,44 @@ export default function Cashier() {
 
         <h2 className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50">Current Order</h2>
 
-        {cart.map((item) => (
-          <div key={`${item.id}-${item.selectedSize}`} className="mb-3">
+        <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-2">
+          {cart.map((item) => (
+            <div key={`${item.id}-${item.selectedSize}`} className="bg-stone-50 dark:bg-stone-800/30 p-3 rounded-xl border border-stone-100 dark:border-stone-800">
 
-            <p className="font-semibold text-stone-900 dark:text-stone-50">
-              {item.name} {item.selectedSize && `(${item.selectedSize})`}
-            </p>
+              <p className="font-semibold text-stone-900 dark:text-stone-50">
+                {item.name} {item.selectedSize && `(${item.selectedSize})`}
+              </p>
 
-            <textarea
-              placeholder="Add note..."
-              className="w-full mt-1 p-2 text-sm border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-800/50 text-stone-900 dark:text-stone-50 focus:outline-none focus:border-amber-500 resize-none h-12"
-              value={item.note || ""}
-              onChange={(e) =>
-                updateNote(item.id, item.selectedSize, e.target.value)
-              }
-            />
+              <textarea
+                placeholder="Add note..."
+                className="w-full mt-1 p-2 text-sm border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-800/50 text-stone-900 dark:text-stone-50 focus:outline-none focus:border-amber-500 resize-none h-12"
+                value={item.note || ""}
+                onChange={(e) =>
+                  updateNote(item.id, item.selectedSize, e.target.value)
+                }
+              />
 
-            <div className="flex justify-between items-center mt-2">
-              <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 rounded-lg p-1">
-                <button onClick={() => decreaseQuantity(item.id, item.selectedSize)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white transition-colors hover:bg-stone-50 dark:hover:bg-stone-600">
-                  -
-                </button>
-                <span className="w-5 text-center text-stone-900 dark:text-stone-50 font-medium">{item.quantity}</span>
-                <button onClick={() => increaseQuantity(item.id, item.selectedSize)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white transition-colors hover:bg-stone-50 dark:hover:bg-stone-600">
-                  +
+              <div className="flex justify-between items-center mt-2">
+                <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 rounded-lg p-1">
+                  <button onClick={() => decreaseQuantity(item.id, item.selectedSize)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white transition-colors hover:bg-stone-50 dark:hover:bg-stone-600">
+                    -
+                  </button>
+                  <span className="w-5 text-center text-stone-900 dark:text-stone-50 font-medium">{item.quantity}</span>
+                  <button onClick={() => increaseQuantity(item.id, item.selectedSize)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white transition-colors hover:bg-stone-50 dark:hover:bg-stone-600">
+                    +
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => removeFromCart(item.id, item.selectedSize)}
+                  className="text-red-500 text-sm hover:underline font-medium"
+                >
+                  Remove
                 </button>
               </div>
-
-              <button
-                onClick={() => removeFromCart(item.id, item.selectedSize)}
-                className="text-red-500 text-sm hover:underline font-medium"
-              >
-                Remove
-              </button>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
         {/* ✅ DISCOUNT SUMMARY MOVED HERE */}
         <div className="mt-auto pt-4">
