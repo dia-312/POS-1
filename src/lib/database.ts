@@ -307,6 +307,19 @@ export async function decreaseStock(
   );
 }
 
+/* DATE HELPER */
+function getTodayBounds() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = today.toISOString();
+  
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const end = tomorrow.toISOString();
+  
+  return { start, end };
+}
+
 /* SALES */
 
 export async function createSale(
@@ -328,26 +341,30 @@ export async function createSale(
 
 export async function getTodaySales() {
   const database = await getDB();
+  const { start, end } = getTodayBounds();
 
   return await database.select(`
     SELECT *
     FROM sales
+    WHERE created_at >= ? AND created_at < ?
     ORDER BY id DESC
-  `);
+  `, [start, end]);
 }
 
 /* DASHBOARD */
 
 export async function getDashboardStats() {
   const database = await getDB();
+  const { start, end } = getTodayBounds();
 
-  const sales =
+  const sales: any =
     await database.select(`
       SELECT
         SUM(total) as revenue,
         COUNT(*) as orders
       FROM sales
-    `);
+      WHERE created_at >= ? AND created_at < ?
+    `, [start, end]);
 
   const products =
     await database.select(`
@@ -376,6 +393,58 @@ export async function getSalesChart() {
   `);
 }
 
+export async function getMonthlyReports() {
+  const database = await getDB();
+
+  const sales = await database.select(`
+    SELECT
+      strftime('%Y-%m', created_at) as month,
+      SUM(total) as revenue,
+      COUNT(*) as orders
+    FROM sales
+    GROUP BY strftime('%Y-%m', created_at)
+    ORDER BY month DESC
+  `);
+
+  const expenses = await database.select(`
+    SELECT
+      strftime('%Y-%m', created_at) as month,
+      SUM(amount) as expenses
+    FROM expenses
+    GROUP BY strftime('%Y-%m', created_at)
+    ORDER BY month DESC
+  `);
+
+  const reportMap: Record<string, any> = {};
+
+  sales.forEach((s: any) => {
+    reportMap[s.month] = {
+      month: s.month,
+      revenue: s.revenue || 0,
+      orders: s.orders || 0,
+      expenses: 0,
+      profit: s.revenue || 0
+    };
+  });
+
+  expenses.forEach((e: any) => {
+    if (!reportMap[e.month]) {
+      reportMap[e.month] = {
+        month: e.month,
+        revenue: 0,
+        orders: 0,
+        expenses: e.expenses || 0,
+        profit: -(e.expenses || 0)
+      };
+    } else {
+      reportMap[e.month].expenses = e.expenses || 0;
+      reportMap[e.month].profit = reportMap[e.month].revenue - (e.expenses || 0);
+    }
+  });
+
+  return Object.values(reportMap).sort((a: any, b: any) => b.month.localeCompare(a.month));
+}
+
 export async function getLowStockProducts() {
   const database = await getDB();
 
@@ -389,12 +458,14 @@ export async function getLowStockProducts() {
 
 export async function getTotalProfit() {
   const database = await getDB();
+  const { start, end } = getTodayBounds();
 
-  const result =
+  const result: any =
     await database.select(`
       SELECT SUM(total) as profit
       FROM sales
-    `);
+      WHERE created_at >= ? AND created_at < ?
+    `, [start, end]);
 
   return result[0]?.profit || 0;
 }
@@ -504,22 +575,26 @@ export async function addExpense(
 
 export async function getExpenses() {
   const database = await getDB();
+  const { start, end } = getTodayBounds();
 
   return await database.select(`
     SELECT *
     FROM expenses
+    WHERE created_at >= ? AND created_at < ?
     ORDER BY id DESC
-  `);
+  `, [start, end]);
 }
 
 export async function getTotalExpenses() {
   const database = await getDB();
+  const { start, end } = getTodayBounds();
 
-  const result =
+  const result: any =
     await database.select(`
       SELECT SUM(amount) as total
       FROM expenses
-    `);
+      WHERE created_at >= ? AND created_at < ?
+    `, [start, end]);
 
   return result[0]?.total || 0;
 }

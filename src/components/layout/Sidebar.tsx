@@ -30,6 +30,10 @@ export default function Sidebar() {
             name: "Users",
             path: "/users",
           },
+          {
+            name: "Reports",
+            path: "/reports",
+          },
         ]
       : []),
 

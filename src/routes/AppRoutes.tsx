@@ -12,6 +12,7 @@ import Login from "../pages/Login";
 import Expenses from "../pages/Expenses";
 import Settings from "../pages/Settings";
 import Users from "../pages/Users";
+import Reports from "../pages/Reports";
 
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
@@ -43,6 +44,15 @@ export default function AppRoutes() {
         element={
           <AdminRoute>
             <Users />
+          </AdminRoute>
+        }
+      />
+
+      <Route
+        path="/reports"
+        element={
+          <AdminRoute>
+            <Reports />
           </AdminRoute>
         }
       />
