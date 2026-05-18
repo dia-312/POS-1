@@ -6,11 +6,14 @@ type OrderItem = {
   name: string;
   quantity: number;
   price: number;
+  selectedSize?: string;
 };
 
 type Order = {
   id: number;
   items: OrderItem[];
+  subtotal: number;
+  discount: number;
   total: number;
   createdAt: string;
 };

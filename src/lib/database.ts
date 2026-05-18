@@ -239,22 +239,19 @@ export async function createSale(total: number) {
     [total, new Date().toISOString()]
   );
 
-  // 👇 هذا أهم سطر
   return result.lastInsertId;
 }
 
-export async function getTodaySales() {
+/* 🔥 FIX MISSING: SALES CHART */
+export async function getSalesChart() {
   const database = await getDB();
-  const { start, end } = getTodayBounds();
 
-  return await database.select(
-    `
-    SELECT * FROM sales
-    WHERE created_at >= ? AND created_at < ?
-    ORDER BY id DESC
-  `,
-    [start, end]
-  );
+  return await database.select(`
+    SELECT DATE(created_at) as date, SUM(total) as total
+    FROM sales
+    GROUP BY DATE(created_at)
+    ORDER BY DATE(created_at)
+  `);
 }
 
 /* DASHBOARD */
@@ -282,17 +279,17 @@ export async function getDashboardStats() {
   };
 }
 
-export async function getSalesChart() {
+export async function getLowStockProducts() {
   const database = await getDB();
 
   return await database.select(`
-    SELECT DATE(created_at) as date, SUM(total) as total
-    FROM sales
-    GROUP BY DATE(created_at)
-    ORDER BY DATE(created_at)
+    SELECT * FROM products
+    WHERE stock <= 5
+    ORDER BY stock ASC
   `);
 }
 
+/* MONTHLY REPORTS */
 export async function getMonthlyReports() {
   const database = await getDB();
 
@@ -343,16 +340,7 @@ export async function getMonthlyReports() {
   return Object.values(map);
 }
 
-export async function getLowStockProducts() {
-  const database = await getDB();
-
-  return await database.select(`
-    SELECT * FROM products
-    WHERE stock <= 5
-    ORDER BY stock ASC
-  `);
-}
-
+/* TOTAL PROFIT */
 export async function getTotalProfit() {
   const database = await getDB();
   const { start, end } = getTodayBounds();
