@@ -1,4 +1,5 @@
 import Database from "@tauri-apps/plugin-sql";
+import defaultProducts from "./defaultProducts.json";
 
 let db: any = null;
 
@@ -104,6 +105,42 @@ try {
         "1111",
       ]
     );
+  }
+
+  /* SEED DEFAULT PRODUCTS */
+  try {
+    const productsCount: any = await database.select(`
+      SELECT COUNT(*) as count FROM products
+    `);
+
+    if (productsCount[0].count === 0) {
+      for (const prod of defaultProducts) {
+        // We use raw SQL to avoid depending on addProduct being initialized,
+        // or we can just call addProduct since it's hoisted/exported.
+        const firstPrice = prod.sizes.length > 0 ? Number(prod.sizes[0].price) : 0;
+        await database.execute(
+          `
+            INSERT INTO products (
+              name,
+              price,
+              stock,
+              category,
+              sizes
+            )
+            VALUES (?, ?, ?, ?, ?)
+          `,
+          [
+            prod.name,
+            firstPrice,
+            prod.stock,
+            prod.category,
+            JSON.stringify(prod.sizes),
+          ]
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Failed to seed products:", error);
   }
 }
 

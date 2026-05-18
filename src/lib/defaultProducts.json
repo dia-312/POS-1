@@ -1,0 +1,1617 @@
+[
+  {
+    "name": "Iced Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Iced Spanish Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Iced Strawberry Spanish Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Iced Blue Curacao Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Iced Mocha Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Iced White Mocha",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Iced Dark Mocha",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Iced Coffee",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Iced Coffee Diet",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Iced Americano",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Iced Vanilla Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Iced Hazelnut Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Iced Caramel Latte",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Iced Nutella",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Iced Caramel Macchiato",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Iced Strawberry Tea",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Iced Peach Tea",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Iced Pink Lemonade",
+    "stock": 100,
+    "category": "Ice",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Carrot Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Orange Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Pomegranate Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Apple Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Lemon Mint Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Lemonade",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Beetroot & Carrot Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Beetroot, Carrot & Ginger Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 9.0
+      },
+      {
+        "size": "Medium",
+        "price": 11.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 9.0
+  },
+  {
+    "name": "Beetroot, Carrot & Apple Juice",
+    "stock": 100,
+    "category": "Natural",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 9.0
+      },
+      {
+        "size": "Medium",
+        "price": 11.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 9.0
+  },
+  {
+    "name": "Strawberry Smoothie",
+    "stock": 100,
+    "category": "Smoothie",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Strawberry Lemon Smoothie",
+    "stock": 100,
+    "category": "Smoothie",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Mango Smoothie",
+    "stock": 100,
+    "category": "Smoothie",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Pineapple Smoothie",
+    "stock": 100,
+    "category": "Smoothie",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Miss Flora Smoothie",
+    "stock": 100,
+    "category": "Smoothie",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Mixed Berry Smoothie",
+    "stock": 100,
+    "category": "Smoothie",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "House Special Mix (with Basil)",
+    "stock": 100,
+    "category": "Smoothie",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Nutella Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Oreo Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Cerelac Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Strawberry Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Cheesecake Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Dubai Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Lotus Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Citrus Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Pistachio Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Snickers Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Caramel Milkshake",
+    "stock": 100,
+    "category": "Milkeshake",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 12.0
+      },
+      {
+        "size": "Medium",
+        "price": 14.0
+      },
+      {
+        "size": "Large",
+        "price": 16.0
+      }
+    ],
+    "price": 12.0
+  },
+  {
+    "name": "Strawberry Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "Pineapple Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "Watermelon Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "Miss Flora Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "Blue Curacao Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "Bubble Gum Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "Mixed Berry Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "Citrus Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 14.0
+  },
+  {
+    "name": "House Sweet Mojito",
+    "stock": 100,
+    "category": "Mojito",
+    "sizes": [
+      {
+        "size": "Large",
+        "price": 15.0
+      }
+    ],
+    "price": 15.0
+  },
+  {
+    "name": "Single Espresso",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 4.0
+      },
+      {
+        "size": "Medium",
+        "price": 6.0
+      },
+      {
+        "size": "Large",
+        "price": 8.0
+      }
+    ],
+    "price": 4.0
+  },
+  {
+    "name": "Double Espresso",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 6.0
+      },
+      {
+        "size": "Medium",
+        "price": 8.0
+      },
+      {
+        "size": "Large",
+        "price": 10.0
+      }
+    ],
+    "price": 6.0
+  },
+  {
+    "name": "Americano",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Nescafe",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 5.0
+      },
+      {
+        "size": "Medium",
+        "price": 7.0
+      },
+      {
+        "size": "Large",
+        "price": 9.0
+      }
+    ],
+    "price": 5.0
+  },
+  {
+    "name": "Cappuccino",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "French Vanilla",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 7.0
+      },
+      {
+        "size": "Medium",
+        "price": 9.0
+      },
+      {
+        "size": "Large",
+        "price": 11.0
+      }
+    ],
+    "price": 7.0
+  },
+  {
+    "name": "Hot Chocolate",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Snickers Hot Chocolate",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 9.0
+      },
+      {
+        "size": "Medium",
+        "price": 11.0
+      },
+      {
+        "size": "Large",
+        "price": 13.0
+      }
+    ],
+    "price": 9.0
+  },
+  {
+    "name": "Hazelnut Hot Chocolate",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 9.0
+      },
+      {
+        "size": "Medium",
+        "price": 11.0
+      },
+      {
+        "size": "Large",
+        "price": 13.0
+      }
+    ],
+    "price": 9.0
+  },
+  {
+    "name": "Dark Hot Chocolate",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 9.0
+      },
+      {
+        "size": "Medium",
+        "price": 11.0
+      },
+      {
+        "size": "Large",
+        "price": 13.0
+      }
+    ],
+    "price": 9.0
+  },
+  {
+    "name": "Hot Mocha",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Hot Mocha Diet",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Hot Caramel",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Hot Lotus",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Hot Cerelac",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Hot Spanish Latte",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Hot French Latte",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Vanilla Latte",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Caramel Latte",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Pistachio Latte",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Tea",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 4.0
+      },
+      {
+        "size": "Medium",
+        "price": 6.0
+      },
+      {
+        "size": "Large",
+        "price": 8.0
+      }
+    ],
+    "price": 4.0
+  },
+  {
+    "name": "Salted Caramel",
+    "stock": 100,
+    "category": "Hot",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Fruit Cocktail",
+    "stock": 100,
+    "category": "Cocktail",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Nut Cocktail",
+    "stock": 100,
+    "category": "Cocktail",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Banana Milk",
+    "stock": 100,
+    "category": "Cocktail",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 8.0
+      },
+      {
+        "size": "Medium",
+        "price": 10.0
+      },
+      {
+        "size": "Large",
+        "price": 12.0
+      }
+    ],
+    "price": 8.0
+  },
+  {
+    "name": "Banana, Milk & Oats",
+    "stock": 100,
+    "category": "Cocktail",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 9.0
+      },
+      {
+        "size": "Medium",
+        "price": 11.0
+      },
+      {
+        "size": "Large",
+        "price": 13.0
+      }
+    ],
+    "price": 9.0
+  },
+  {
+    "name": "Banana, Milk & Dates",
+    "stock": 100,
+    "category": "Cocktail",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 9.0
+      },
+      {
+        "size": "Medium",
+        "price": 11.0
+      },
+      {
+        "size": "Large",
+        "price": 13.0
+      }
+    ],
+    "price": 9.0
+  },
+  {
+    "name": "Iced Coffee Diet",
+    "stock": 100,
+    "category": "Healthy",
+    "sizes": [],
+    "price": 0.0
+  },
+  {
+    "name": "Caramel Latte Sugar-Free",
+    "stock": 100,
+    "category": "Healthy",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Hazelnut Latte Sugar-Free",
+    "stock": 100,
+    "category": "Healthy",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  },
+  {
+    "name": "Vanilla Latte Sugar-Free",
+    "stock": 100,
+    "category": "Healthy",
+    "sizes": [
+      {
+        "size": "Small",
+        "price": 10.0
+      },
+      {
+        "size": "Medium",
+        "price": 12.0
+      },
+      {
+        "size": "Large",
+        "price": 14.0
+      }
+    ],
+    "price": 10.0
+  }
+]
