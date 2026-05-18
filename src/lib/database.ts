@@ -4,24 +4,18 @@ import defaultProducts from "./defaultProducts.json";
 let db: any = null;
 
 /* GET DATABASE */
-
 async function getDB() {
   if (!db) {
-    db = await Database.load(
-      "sqlite:pos-final.db"
-    );
+    db = await Database.load("sqlite:pos-final.db");
   }
-
   return db;
 }
 
 /* INIT DATABASE */
-
 export async function initDB() {
   const database = await getDB();
 
   /* USERS */
-
   await database.execute(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,33 +27,26 @@ export async function initDB() {
   `);
 
   /* PRODUCTS */
-
   await database.execute(`
-  CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    stock INTEGER NOT NULL,
-    category TEXT,
-    sizes TEXT
-  )
-`);
-
-try {
-  await database.execute(`
-    ALTER TABLE products
-    ADD COLUMN sizes TEXT
+    CREATE TABLE IF NOT EXISTS products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      stock INTEGER NOT NULL,
+      category TEXT,
+      sizes TEXT,
+      price REAL DEFAULT 0
+    )
   `);
-} catch {}
 
-try {
-  await database.execute(`
-    ALTER TABLE products
-    ADD COLUMN price REAL DEFAULT 0
-  `);
-} catch {}
+  try {
+    await database.execute(`ALTER TABLE products ADD COLUMN sizes TEXT`);
+  } catch {}
+
+  try {
+    await database.execute(`ALTER TABLE products ADD COLUMN price REAL DEFAULT 0`);
+  } catch {}
 
   /* SALES */
-
   await database.execute(`
     CREATE TABLE IF NOT EXISTS sales (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,7 +56,6 @@ try {
   `);
 
   /* EXPENSES */
-
   await database.execute(`
     CREATE TABLE IF NOT EXISTS expenses (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,56 +65,34 @@ try {
     )
   `);
 
-  /* CREATE DEFAULT ADMIN */
-
+  /* DEFAULT ADMIN */
   const admins = await database.select(`
-    SELECT *
-    FROM users
-    WHERE role = 'admin'
+    SELECT * FROM users WHERE role = 'admin'
   `);
 
   if (admins.length === 0) {
     await database.execute(
-      `
-        INSERT INTO users (
-          username,
-          password,
-          role,
-          pin
-        )
-        VALUES (?, ?, ?, ?)
-      `,
-      [
-        "admin",
-        "1234",
-        "admin",
-        "1111",
-      ]
+      `INSERT INTO users (username, password, role, pin) VALUES (?, ?, ?, ?)`,
+      ["admin", "1234", "admin", "1111"]
     );
   }
 
-  /* SEED DEFAULT PRODUCTS */
+  /* SEED PRODUCTS */
   try {
-    const productsCount: any = await database.select(`
-      SELECT COUNT(*) as count FROM products
-    `);
+    const count: any = await database.select(
+      `SELECT COUNT(*) as count FROM products`
+    );
 
-    if (productsCount[0].count === 0) {
+    if (count[0].count === 0) {
       for (const prod of defaultProducts) {
-        // We use raw SQL to avoid depending on addProduct being initialized,
-        // or we can just call addProduct since it's hoisted/exported.
-        const firstPrice = prod.sizes.length > 0 ? Number(prod.sizes[0].price) : 0;
+        const firstPrice =
+          prod.sizes?.length > 0 ? Number(prod.sizes[0].price) : 0;
+
         await database.execute(
           `
-            INSERT INTO products (
-              name,
-              price,
-              stock,
-              category,
-              sizes
-            )
-            VALUES (?, ?, ?, ?, ?)
-          `,
+          INSERT INTO products (name, price, stock, category, sizes)
+          VALUES (?, ?, ?, ?, ?)
+        `,
           [
             prod.name,
             firstPrice,
@@ -139,68 +103,50 @@ try {
         );
       }
     }
-  } catch (error) {
-    console.error("Failed to seed products:", error);
+  } catch (err) {
+    console.error("Seed error:", err);
   }
 }
 
 /* LOGIN */
-
-export async function loginUser(
-  username: string,
-  password: string
-) {
+export async function loginUser(username: string, password: string) {
   const database = await getDB();
 
-  const result =
-    await database.select(
-      `
-        SELECT *
-        FROM users
-        WHERE username = ?
-        AND password = ?
-      `,
-      [username, password]
-    );
+  const result: any = await database.select(
+    `
+    SELECT * FROM users
+    WHERE username = ? AND password = ?
+  `,
+    [username, password]
+  );
 
   return result[0] || null;
 }
 
-export async function loginWithPin(
-  pin: string
-) {
+export async function loginWithPin(pin: string) {
   const database = await getDB();
 
-  const result =
-    await database.select(
-      `
-        SELECT *
-        FROM users
-        WHERE pin = ?
-      `,
-      [pin]
-    );
+  const result: any = await database.select(
+    `
+    SELECT * FROM users WHERE pin = ?
+  `,
+    [pin]
+  );
 
   return result[0] || null;
 }
 
 /* PRODUCTS */
-
 export async function getProducts() {
   const database = await getDB();
 
-  const products =
-    await database.select(`
-      SELECT *
-      FROM products
-      ORDER BY id DESC
-    `);
+  const products: any = await database.select(`
+    SELECT * FROM products ORDER BY id DESC
+  `);
 
-  return products.map((product: any) => ({
-    ...product,
-    sizes: product.sizes
-      ? JSON.parse(product.sizes)
-      : [],
+  return products.map((p: any) => ({
+    ...p,
+    sizes: p.sizes ? JSON.parse(p.sizes) : [],
   }));
 }
 
@@ -213,28 +159,14 @@ export async function addProduct(
   const database = await getDB();
 
   const firstPrice =
-    sizes.length > 0
-      ? Number(sizes[0].price)
-      : 0;
+    sizes.length > 0 ? Number(sizes[0].price) : 0;
 
   await database.execute(
     `
-      INSERT INTO products (
-        name,
-        price,
-        stock,
-        category,
-        sizes
-      )
-      VALUES (?, ?, ?, ?, ?)
-    `,
-    [
-      name,
-      firstPrice,
-      stock,
-      category,
-      JSON.stringify(sizes),
-    ]
+    INSERT INTO products (name, price, stock, category, sizes)
+    VALUES (?, ?, ?, ?, ?)
+  `,
+    [name, firstPrice, stock, category, JSON.stringify(sizes)]
   );
 }
 
@@ -247,87 +179,56 @@ export async function updateProduct(
 ) {
   const database = await getDB();
 
-  // احسب اول سعر من الاحجام
   const firstPrice =
-    sizes.length > 0
-      ? Number(sizes[0].price)
-      : 0;
+    sizes.length > 0 ? Number(sizes[0].price) : 0;
 
   await database.execute(
     `
-      UPDATE products
-      SET
-        name = ?,
-        price = ?,
-        stock = ?,
-        category = ?,
-        sizes = ?
-      WHERE id = ?
-    `,
-    [
-      name,
-      firstPrice,
-      stock,
-      category,
-      JSON.stringify(sizes),
-      id,
-    ]
+    UPDATE products
+    SET name=?, price=?, stock=?, category=?, sizes=?
+    WHERE id=?
+  `,
+    [name, firstPrice, stock, category, JSON.stringify(sizes), id]
   );
 }
 
-export async function deleteProduct(
-  id: number
-) {
+export async function deleteProduct(id: number) {
   const database = await getDB();
 
-  await database.execute(
-    `
-      DELETE FROM products
-      WHERE id = ?
-    `,
-    [id]
-  );
+  await database.execute(`DELETE FROM products WHERE id=?`, [id]);
 }
 
 /* STOCK */
-
-export async function decreaseStock(
-  id: number,
-  quantity: number
-) {
+export async function decreaseStock(id: number, quantity: number) {
   const database = await getDB();
 
   await database.execute(
-    `
-      UPDATE products
-      SET stock = stock - ?
-      WHERE id = ?
-    `,
+    `UPDATE products SET stock = stock - ? WHERE id=?`,
     [quantity, id]
   );
 }
 
-/* DATE HELPER */
+/* DATE */
 function getTodayBounds() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
   const start = today.toISOString();
-  
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const end = tomorrow.toISOString();
-  
-  return { start, end };
+
+  const end = new Date(today);
+  end.setDate(end.getDate() + 1);
+
+  return {
+    start,
+    end: end.toISOString(),
+  };
 }
 
 /* SALES */
-
-export async function createSale(
-  total: number
-) {
+export async function createSale(total: number) {
   const database = await getDB();
 
-  await database.execute(
+  const result: any = await database.execute(
     `
       INSERT INTO sales (
         total,
@@ -337,46 +238,47 @@ export async function createSale(
     `,
     [total, new Date().toISOString()]
   );
+
+  // 👇 هذا أهم سطر
+  return result.lastInsertId;
 }
 
 export async function getTodaySales() {
   const database = await getDB();
   const { start, end } = getTodayBounds();
 
-  return await database.select(`
-    SELECT *
-    FROM sales
+  return await database.select(
+    `
+    SELECT * FROM sales
     WHERE created_at >= ? AND created_at < ?
     ORDER BY id DESC
-  `, [start, end]);
+  `,
+    [start, end]
+  );
 }
 
 /* DASHBOARD */
-
 export async function getDashboardStats() {
   const database = await getDB();
   const { start, end } = getTodayBounds();
 
-  const sales: any =
-    await database.select(`
-      SELECT
-        SUM(total) as revenue,
-        COUNT(*) as orders
-      FROM sales
-      WHERE created_at >= ? AND created_at < ?
-    `, [start, end]);
+  const sales: any = await database.select(
+    `
+    SELECT SUM(total) as revenue, COUNT(*) as orders
+    FROM sales
+    WHERE created_at >= ? AND created_at < ?
+  `,
+    [start, end]
+  );
 
-  const products =
-    await database.select(`
-      SELECT COUNT(*) as products
-      FROM products
-    `);
+  const products: any = await database.select(`
+    SELECT COUNT(*) as products FROM products
+  `);
 
   return {
     revenue: sales[0]?.revenue || 0,
     orders: sales[0]?.orders || 0,
-    products:
-      products[0]?.products || 0,
+    products: products[0]?.products || 0,
   };
 }
 
@@ -384,9 +286,7 @@ export async function getSalesChart() {
   const database = await getDB();
 
   return await database.select(`
-    SELECT
-      DATE(created_at) as date,
-      SUM(total) as total
+    SELECT DATE(created_at) as date, SUM(total) as total
     FROM sales
     GROUP BY DATE(created_at)
     ORDER BY DATE(created_at)
@@ -396,61 +296,58 @@ export async function getSalesChart() {
 export async function getMonthlyReports() {
   const database = await getDB();
 
-  const sales = await database.select(`
-    SELECT
-      strftime('%Y-%m', created_at) as month,
-      SUM(total) as revenue,
-      COUNT(*) as orders
+  const sales: any = await database.select(`
+    SELECT strftime('%Y-%m', created_at) as month,
+           SUM(total) as revenue,
+           COUNT(*) as orders
     FROM sales
-    GROUP BY strftime('%Y-%m', created_at)
+    GROUP BY month
     ORDER BY month DESC
   `);
 
-  const expenses = await database.select(`
-    SELECT
-      strftime('%Y-%m', created_at) as month,
-      SUM(amount) as expenses
+  const expenses: any = await database.select(`
+    SELECT strftime('%Y-%m', created_at) as month,
+           SUM(amount) as expenses
     FROM expenses
-    GROUP BY strftime('%Y-%m', created_at)
-    ORDER BY month DESC
+    GROUP BY month
   `);
 
-  const reportMap: Record<string, any> = {};
+  const map: any = {};
 
   sales.forEach((s: any) => {
-    reportMap[s.month] = {
+    map[s.month] = {
       month: s.month,
       revenue: s.revenue || 0,
       orders: s.orders || 0,
       expenses: 0,
-      profit: s.revenue || 0
+      profit: s.revenue || 0,
     };
   });
 
   expenses.forEach((e: any) => {
-    if (!reportMap[e.month]) {
-      reportMap[e.month] = {
+    if (!map[e.month]) {
+      map[e.month] = {
         month: e.month,
         revenue: 0,
         orders: 0,
         expenses: e.expenses || 0,
-        profit: -(e.expenses || 0)
+        profit: -(e.expenses || 0),
       };
     } else {
-      reportMap[e.month].expenses = e.expenses || 0;
-      reportMap[e.month].profit = reportMap[e.month].revenue - (e.expenses || 0);
+      map[e.month].expenses = e.expenses || 0;
+      map[e.month].profit =
+        map[e.month].revenue - e.expenses;
     }
   });
 
-  return Object.values(reportMap).sort((a: any, b: any) => b.month.localeCompare(a.month));
+  return Object.values(map);
 }
 
 export async function getLowStockProducts() {
   const database = await getDB();
 
   return await database.select(`
-    SELECT *
-    FROM products
+    SELECT * FROM products
     WHERE stock <= 5
     ORDER BY stock ASC
   `);
@@ -460,25 +357,24 @@ export async function getTotalProfit() {
   const database = await getDB();
   const { start, end } = getTodayBounds();
 
-  const result: any =
-    await database.select(`
-      SELECT SUM(total) as profit
-      FROM sales
-      WHERE created_at >= ? AND created_at < ?
-    `, [start, end]);
+  const result: any = await database.select(
+    `
+    SELECT SUM(total) as profit
+    FROM sales
+    WHERE created_at >= ? AND created_at < ?
+  `,
+    [start, end]
+  );
 
   return result[0]?.profit || 0;
 }
 
 /* USERS */
-
 export async function getUsers() {
   const database = await getDB();
 
   return await database.select(`
-    SELECT *
-    FROM users
-    ORDER BY id DESC
+    SELECT * FROM users ORDER BY id DESC
   `);
 }
 
@@ -492,84 +388,29 @@ export async function addUser(
 
   await database.execute(
     `
-      INSERT INTO users (
-        username,
-        password,
-        role,
-        pin
-      )
-      VALUES (?, ?, ?, ?)
-    `,
-    [
-      username,
-      password,
-      role,
-      pin,
-    ]
+    INSERT INTO users (username, password, role, pin)
+    VALUES (?, ?, ?, ?)
+  `,
+    [username, password, role, pin]
   );
 }
 
-export async function deleteUser(
-  id: number
-) {
+export async function deleteUser(id: number) {
   const database = await getDB();
 
-  const user =
-    await database.select(
-      `
-        SELECT *
-        FROM users
-        WHERE id = ?
-      `,
-      [id]
-    );
-
-  if (user[0]?.role === "admin") {
-    const admins =
-      await database.select(`
-        SELECT *
-        FROM users
-        WHERE role = 'admin'
-      `);
-
-    if (admins.length <= 1) {
-      throw new Error(
-        "Cannot delete last admin"
-      );
-    }
-  }
-
-  await database.execute(
-    `
-      DELETE FROM users
-      WHERE id = ?
-    `,
-    [id]
-  );
+  await database.execute(`DELETE FROM users WHERE id=?`, [id]);
 }
 
 /* EXPENSES */
-
-export async function addExpense(
-  title: string,
-  amount: number
-) {
+export async function addExpense(title: string, amount: number) {
   const database = await getDB();
 
   await database.execute(
     `
-      INSERT INTO expenses (
-        title,
-        amount,
-        created_at
-      )
-      VALUES (?, ?, ?)
-    `,
-    [
-      title,
-      amount,
-      new Date().toISOString(),
-    ]
+    INSERT INTO expenses (title, amount, created_at)
+    VALUES (?, ?, ?)
+  `,
+    [title, amount, new Date().toISOString()]
   );
 }
 
@@ -577,24 +418,35 @@ export async function getExpenses() {
   const database = await getDB();
   const { start, end } = getTodayBounds();
 
-  return await database.select(`
-    SELECT *
-    FROM expenses
+  return await database.select(
+    `
+    SELECT * FROM expenses
     WHERE created_at >= ? AND created_at < ?
     ORDER BY id DESC
-  `, [start, end]);
+  `,
+    [start, end]
+  );
 }
 
 export async function getTotalExpenses() {
   const database = await getDB();
   const { start, end } = getTodayBounds();
 
-  const result: any =
-    await database.select(`
-      SELECT SUM(amount) as total
-      FROM expenses
-      WHERE created_at >= ? AND created_at < ?
-    `, [start, end]);
+  const result: any = await database.select(
+    `
+    SELECT SUM(amount) as total
+    FROM expenses
+    WHERE created_at >= ? AND created_at < ?
+  `,
+    [start, end]
+  );
 
   return result[0]?.total || 0;
+}
+
+/* DELETE SALE */
+export async function deleteSale(id: number) {
+  const database = await getDB();
+
+  await database.execute(`DELETE FROM sales WHERE id=?`, [id]);
 }

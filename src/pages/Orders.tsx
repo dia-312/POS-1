@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useOrdersStore } from "../store/useOrdersStore";
+import { deleteSale } from "../lib/database";
 
 export default function Orders() {
-
-  const { orders } = useOrdersStore();
+  const { orders, setOrders } = useOrdersStore();
 
   const [selectedOrder, setSelectedOrder] =
     useState<number | null>(null);
@@ -12,412 +12,98 @@ export default function Orders() {
     (order) => order.id === selectedOrder
   );
 
-  const printReceipt = (order: any) => {
+  const handleDelete = async (id: number) => {
+    try {
+      console.log("DELETE CLICKED:", id);
 
-    const receiptContent = `
-      <html>
+      // 1. delete from database
+      await deleteSale(id);
 
-        <head>
-
-          <title>Receipt</title>
-
-          <style>
-
-            body {
-              font-family: Arial;
-              padding: 20px;
-              color: black;
-            }
-
-            h1 {
-              text-align: center;
-            }
-
-            .item {
-              margin: 10px 0;
-              border-bottom: 1px dashed #ccc;
-              padding-bottom: 8px;
-            }
-
-            .row {
-              display: flex;
-              justify-content: space-between;
-            }
-
-            .note {
-              font-size: 12px;
-              color: gray;
-              margin-top: 4px;
-            }
-
-            .total {
-              margin-top: 20px;
-              font-size: 22px;
-              font-weight: bold;
-            }
-
-          </style>
-
-        </head>
-
-        <body>
-
-          <h1>POS RECEIPT</h1>
-
-          <p>
-            <strong>Order ID:</strong>
-            #${order.id}
-          </p>
-
-          <p>
-            <strong>Date:</strong>
-
-            ${new Date(
-              order.createdAt
-            ).toLocaleString()}
-          </p>
-
-          <hr />
-
-          ${order.items
-            .map(
-              (item: any) => `
-                <div class="item">
-
-                  <div class="row">
-
-                    <span>
-                      ${item.name}
-
-                      ${
-                        item.selectedSize
-                          ? ` (${item.selectedSize})`
-                          : ""
-                      }
-
-                      x${item.quantity}
-                    </span>
-
-                    <span>
-                      ₪${(
-                        item.price *
-                        item.quantity
-                      ).toFixed(2)}
-                    </span>
-
-                  </div>
-
-                  ${
-                    item.note
-                      ? `
-                        <div class="note">
-                          Note:
-                          ${item.note}
-                        </div>
-                      `
-                      : ""
-                  }
-
-                </div>
-              `
-            )
-            .join("")}
-
-          <hr />
-
-          <div class="total">
-            Total:
-            ₪${order.total.toFixed(2)}
-          </div>
-
-        </body>
-
-      </html>
-    `;
-
-    const printWindow =
-      document.createElement("iframe");
-
-    printWindow.style.position =
-      "fixed";
-
-    printWindow.style.right = "0";
-
-    printWindow.style.bottom = "0";
-
-    printWindow.style.width = "0";
-
-    printWindow.style.height = "0";
-
-    printWindow.style.border = "0";
-
-    document.body.appendChild(
-      printWindow
-    );
-
-    const doc =
-      printWindow.contentWindow?.document;
-
-    if (!doc) return;
-
-    doc.open();
-
-    doc.write(receiptContent);
-
-    doc.close();
-
-    printWindow.contentWindow?.focus();
-
-    printWindow.contentWindow?.print();
-
-    setTimeout(() => {
-
-      document.body.removeChild(
-        printWindow
+      // 2. update zustand state immediately
+      const updatedOrders = orders.filter(
+        (o) => o.id !== id
       );
 
-    }, 1000);
+      setOrders(updatedOrders);
+
+      // 3. IMPORTANT: delay dashboard refresh قليلاً
+      setTimeout(() => {
+        window.dispatchEvent(
+          new Event("dashboard-refresh")
+        );
+      }, 100);
+
+      // 4. clear selected order if deleted
+      if (selectedOrder === id) {
+        setSelectedOrder(null);
+      }
+
+      console.log("DELETE DONE");
+    } catch (err) {
+      console.error("DELETE ERROR:", err);
+    }
   };
 
   return (
-
     <div className="grid grid-cols-3 gap-6 h-full">
 
-      {/* ORDERS TABLE */}
+      {/* ORDERS LIST */}
+      <div className="col-span-2 bg-white p-6">
 
-      <div className="col-span-2 bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden">
+        <h1 className="text-2xl font-bold mb-4">
+          Orders
+        </h1>
 
-        <div className="p-6 border-b border-stone-200 dark:border-stone-700">
-
-          <h1 className="text-3xl font-bold text-stone-900 dark:text-white">
-            Orders
-          </h1>
-
-        </div>
-
-        <div className="overflow-auto max-h-[80vh]">
-
-          <table className="w-full">
-
-            <thead className="bg-stone-50 dark:bg-stone-900">
-
-              <tr>
-
-                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                  Order ID
-                </th>
-
-                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                  Date
-                </th>
-
-                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                  Items
-                </th>
-
-                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                  Total
-                </th>
-
-                <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                  Action
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {orders.map((order) => (
-
-                <tr
-                  key={order.id}
-                  className="border-b border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:bg-stone-700 transition"
-                >
-
-                  <td className="p-4 text-stone-900 dark:text-white">
-                    #{order.id}
-                  </td>
-
-                  <td className="p-4 text-stone-600 dark:text-stone-300">
-
-                    {new Date(
-                      order.createdAt
-                    ).toLocaleString()}
-
-                  </td>
-
-                  <td className="p-4 text-stone-600 dark:text-stone-300">
-                    {order.items.length}
-                  </td>
-
-                  <td className="p-4 text-stone-900 dark:text-white font-semibold">
-                    ₪{order.total.toFixed(2)}
-                  </td>
-
-                  <td className="p-4">
-
-                    <button
-                      onClick={() =>
-                        setSelectedOrder(order.id)
-                      }
-                      className="bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
-                    >
-                      View
-                    </button>
-
-                  </td>
-
-                </tr>
-              ))}
-
-            </tbody>
-
-          </table>
-
-          {orders.length === 0 && (
-
-            <div className="p-10 text-center text-stone-500 dark:text-stone-400">
-              No Orders Yet
+        {orders.map((order) => (
+          <div
+            key={order.id}
+            className="flex justify-between p-3 border mb-2"
+          >
+            <div>
+              <p>#{order.id}</p>
+              <p>{order.items.length} items</p>
+              <p>₪{order.total}</p>
             </div>
 
-          )}
+            <div className="flex gap-2">
+              <button
+                onClick={() =>
+                  setSelectedOrder(order.id)
+                }
+                className="bg-amber-600 text-white px-3 py-1 rounded"
+              >
+                View
+              </button>
 
-        </div>
+              <button
+                onClick={() =>
+                  handleDelete(order.id)
+                }
+                className="bg-red-600 text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* RECEIPT */}
+      {/* DETAILS */}
+      <div className="p-6 bg-white">
 
-      <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-6 overflow-auto">
+        {currentOrder ? (
+          <>
+            <h2>Order #{currentOrder.id}</h2>
 
-        <h2 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
-          Receipt
-        </h2>
-
-        {!currentOrder && (
-
-          <div className="text-stone-500 dark:text-stone-400">
-            Select Order
-          </div>
-
-        )}
-
-        {currentOrder && (
-
-          <div>
-
-            <div className="mb-6">
-
-              <p className="text-stone-500 dark:text-stone-400 text-sm">
-                Order ID
-              </p>
-
-              <p className="text-stone-900 dark:text-white text-lg font-semibold">
-                #{currentOrder.id}
-              </p>
-
-            </div>
-
-            <div className="mb-6">
-
-              <p className="text-stone-500 dark:text-stone-400 text-sm">
-                Date
-              </p>
-
-              <p className="text-stone-900 dark:text-white">
-
-                {new Date(
-                  currentOrder.createdAt
-                ).toLocaleString()}
-
-              </p>
-
-            </div>
-
-            <div className="space-y-4 mb-6">
-
-              {currentOrder.items.map(
-  (item: any, index: number) => (
-
-    <div
-      key={`${item.id}-${item.selectedSize || "default"}-${index}`}
-      className="flex justify-between items-start"
-    >
-
-                  <div>
-
-                    <p className="text-stone-900 dark:text-white font-medium">
-
-                      {item.name}
-
-                      {item.selectedSize && (
-                        <span className="text-stone-500 dark:text-stone-400 text-sm ml-2">
-                          ({item.selectedSize})
-                        </span>
-                      )}
-
-                    </p>
-
-                    {item.note && (
-
-                      <p className="text-yellow-400 text-xs mt-1">
-                        Note:
-                        {" "}
-                        {item.note}
-                      </p>
-
-                    )}
-
-                    <p className="text-stone-500 dark:text-stone-400 text-sm">
-
-                      {item.quantity}
-                      {" "}x ₪
-                      {item.price}
-
-                    </p>
-
-                  </div>
-
-                  <p className="text-stone-900 dark:text-white font-semibold">
-
-                    ₪
-                    {(
-                      item.quantity *
-                      item.price
-                    ).toFixed(2)}
-
-                  </p>
-
-                </div>
-              ))}
-
-            </div>
-
-            <div className="border-t border-stone-200 dark:border-stone-700 pt-4 flex justify-between text-2xl font-bold text-stone-900 dark:text-white">
-
-              <span>Total</span>
-
-              <span>
-                ₪{currentOrder.total.toFixed(2)}
-              </span>
-
-            </div>
-
-            <button
-              onClick={() =>
-                printReceipt(currentOrder)
-              }
-              className="w-full mt-6 bg-green-600 hover:bg-green-700 text-stone-900 dark:text-white py-3 rounded-lg font-semibold"
-            >
-              Print Receipt
-            </button>
-
-          </div>
+            <p>
+              Total: ₪{currentOrder.total}
+            </p>
+          </>
+        ) : (
+          <p>Select order</p>
         )}
 
       </div>
-
     </div>
   );
 }
