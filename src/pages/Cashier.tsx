@@ -114,7 +114,7 @@ export default function Cashier() {
             .row { display: flex; justify-content: space-between; }
             .note { font-size: 12px; color: gray; margin-top: 4px; }
             .total { margin-top: 20px; font-size: 20px; font-weight: bold; display: flex; justify-content: space-between; }
-            .divider { border-top: 2px dashed black; margin: 40px 0; }
+            .page-break { page-break-after: always; break-after: page; }
           </style>
         </head>
 
@@ -123,7 +123,7 @@ export default function Cashier() {
           <h2>(Customer Copy)</h2>
           ${receiptHTML}
 
-          <div class="divider"></div>
+          <div class="page-break"></div>
 
           <h1>POS RECEIPT</h1>
           <h2>(Barista Copy)</h2>
@@ -173,14 +173,14 @@ export default function Cashier() {
       {/* PRODUCTS */}
       <div className="flex-1 flex flex-col">
 
-        <h1 className="text-3xl font-bold mb-4">Cashier</h1>
+        <h1 className="text-3xl font-bold mb-4 text-stone-900 dark:text-stone-50">Cashier</h1>
 
         <input
           type="text"
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-white border rounded-2xl px-5 py-4 mb-4"
+          className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl px-5 py-4 mb-4 text-stone-900 dark:text-stone-50 focus:outline-none focus:border-amber-500"
         />
 
         {/* DISCOUNT BUTTONS */}
@@ -189,10 +189,10 @@ export default function Cashier() {
             <button
               key={d}
               onClick={() => setDiscount(d)}
-              className={`px-4 py-2 rounded-xl ${
+              className={`px-4 py-2 rounded-xl transition-colors ${
                 discount === d
                   ? "bg-green-600 text-white"
-                  : "bg-gray-200"
+                  : "bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700"
               }`}
             >
               {d === 0 ? "No Discount" : `${d}%`}
@@ -202,7 +202,7 @@ export default function Cashier() {
           <input
             type="number"
             placeholder="%"
-            className="border px-2 rounded"
+            className="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-50 px-3 py-2 rounded-xl w-24 focus:outline-none focus:border-amber-500"
             onChange={(e) => setDiscount(Number(e.target.value))}
           />
         </div>
@@ -226,10 +226,10 @@ export default function Cashier() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-xl ${
+              className={`px-4 py-2 rounded-xl transition-colors ${
                 selectedCategory === cat
                   ? "bg-amber-600 text-white"
-                  : "bg-gray-200"
+                  : "bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700"
               }`}
             >
               {cat}
@@ -252,9 +252,9 @@ export default function Cashier() {
             }
 
             return (
-              <div key={product.id} className="border p-3 rounded-xl">
-                <h2 className="font-bold">{product.name}</h2>
-                <p className="text-sm text-gray-500">{product.category}</p>
+              <div key={product.id} className="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3 rounded-xl hover:border-amber-500/50 transition-colors">
+                <h2 className="font-bold text-stone-900 dark:text-stone-50">{product.name}</h2>
+                <p className="text-sm text-stone-500 dark:text-stone-400">{product.category}</p>
 
                 {sizes.length > 0 ? (
                   <div className="mt-2 space-y-2">
@@ -294,71 +294,75 @@ export default function Cashier() {
       </div>
 
       {/* CART */}
-      <div className="w-[340px] border p-4 rounded-xl">
+      <div className="w-[340px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 rounded-2xl flex flex-col">
 
-        <h2 className="text-xl font-bold mb-2">Current Order</h2>
+        <h2 className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50">Current Order</h2>
 
         {cart.map((item) => (
           <div key={`${item.id}-${item.selectedSize}`} className="mb-3">
 
-            <p>
+            <p className="font-semibold text-stone-900 dark:text-stone-50">
               {item.name} {item.selectedSize && `(${item.selectedSize})`}
             </p>
 
             <textarea
+              placeholder="Add note..."
+              className="w-full mt-1 p-2 text-sm border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-800/50 text-stone-900 dark:text-stone-50 focus:outline-none focus:border-amber-500 resize-none h-12"
               value={item.note || ""}
               onChange={(e) =>
                 updateNote(item.id, item.selectedSize, e.target.value)
               }
             />
 
-            <div className="flex gap-2">
-              <button onClick={() => decreaseQuantity(item.id, item.selectedSize)}>
-                -
-              </button>
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex items-center gap-3 bg-stone-100 dark:bg-stone-800 rounded-lg p-1">
+                <button onClick={() => decreaseQuantity(item.id, item.selectedSize)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white transition-colors hover:bg-stone-50 dark:hover:bg-stone-600">
+                  -
+                </button>
+                <span className="w-5 text-center text-stone-900 dark:text-stone-50 font-medium">{item.quantity}</span>
+                <button onClick={() => increaseQuantity(item.id, item.selectedSize)} className="w-7 h-7 flex items-center justify-center rounded bg-white dark:bg-stone-700 shadow-sm text-stone-900 dark:text-white transition-colors hover:bg-stone-50 dark:hover:bg-stone-600">
+                  +
+                </button>
+              </div>
 
-              <span>{item.quantity}</span>
-
-              <button onClick={() => increaseQuantity(item.id, item.selectedSize)}>
-                +
+              <button
+                onClick={() => removeFromCart(item.id, item.selectedSize)}
+                className="text-red-500 text-sm hover:underline font-medium"
+              >
+                Remove
               </button>
             </div>
-
-            <button
-              onClick={() => removeFromCart(item.id, item.selectedSize)}
-              className="text-red-500"
-            >
-              Remove
-            </button>
           </div>
         ))}
 
         {/* ✅ DISCOUNT SUMMARY MOVED HERE */}
-        <div className="mt-4 p-3 border rounded-xl bg-gray-50">
-          <div className="flex justify-between text-sm">
-            <span>Subtotal:</span>
-            <span>₪{subtotal.toFixed(2)}</span>
+        <div className="mt-auto pt-4">
+          <div className="p-4 border border-stone-200 dark:border-stone-800 rounded-xl bg-stone-50 dark:bg-stone-800/50">
+            <div className="flex justify-between text-sm text-stone-600 dark:text-stone-400 mb-1">
+              <span>Subtotal:</span>
+              <span>₪{subtotal.toFixed(2)}</span>
+            </div>
+
+            <div className="flex justify-between text-sm text-red-600 dark:text-red-400 mb-2">
+              <span>Discount ({discount}%):</span>
+              <span>-₪{(subtotal * (discount / 100)).toFixed(2)}</span>
+            </div>
+
+            <hr className="my-2 border-stone-200 dark:border-stone-700" />
+
+            <div className="flex justify-between font-bold text-lg text-stone-900 dark:text-stone-50">
+              <span>Total:</span>
+              <span>₪{total.toFixed(2)}</span>
+            </div>
           </div>
 
-          <div className="flex justify-between text-sm text-red-600">
-            <span>Discount ({discount}%):</span>
-            <span>-₪{(subtotal * (discount / 100)).toFixed(2)}</span>
-          </div>
-
-          <hr className="my-2" />
-
-          <div className="flex justify-between font-bold">
-            <span>Total:</span>
-            <span>₪{total.toFixed(2)}</span>
-          </div>
+          <button
+            onClick={() => setCheckoutOpen(true)}
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-4 mt-4 rounded-xl font-bold transition-colors text-lg"
+          >
+            Checkout
+          </button>
         </div>
-
-        <button
-          onClick={() => setCheckoutOpen(true)}
-          className="w-full bg-green-600 text-white py-3 mt-4 rounded-xl"
-        >
-          Checkout
-        </button>
 
       </div>
 
