@@ -105,7 +105,7 @@ export default function Cashier() {
     const fullHtml = `
       <html>
         <head>
-          <title>Receipt</title>
+          <title>ORDER</title>
           <style>
             body { font-family: Arial; padding: 20px; color: black; }
             h1 { text-align: center; margin-bottom: 5px; }
@@ -119,13 +119,13 @@ export default function Cashier() {
         </head>
 
         <body>
-          <h1>POS RECEIPT</h1>
+          <h1>MOOD YARD</h1>
           <h2>(Customer Copy)</h2>
           ${receiptHTML}
 
           <div class="page-break"></div>
 
-          <h1>POS RECEIPT</h1>
+          <h1>MOOD YARD</h1>
           <h2>(Barista Copy)</h2>
           ${receiptHTML}
         </body>
