@@ -1,87 +1,87 @@
-??? ?????? ????? ,,,,,
+اسم المدرج للصنف ,,,,,
 type,no ,product ,small price ,medium price,large price 
-ice,1,Iced Latte,8,10,12
-ice,2,Iced Spanish Latte,12,14,16
-ice,3,Iced Strawberry Spanish Latte,12,14,16
-ice,4,Iced Blue Curacao Latte,12,14,16
-ice,5,Iced Mocha Latte,12,14,16
-ice,6,Iced White Mocha,12,14,16
-ice,7,Iced Dark Mocha,12,14,16
-ice,8,Iced Coffee,7,9,11
-ice,9,Iced Coffee Diet,7,9,11
-ice,10,Iced Americano,8,10,12
-ice,11,Iced Vanilla Latte,10,12,14
-ice,12,Iced Hazelnut Latte,10,12,14
-ice,13,Iced Caramel Latte,10,12,14
-ice,14,Iced Nutella,12,14,16
-ice,15,Iced Caramel Macchiato,10,12,14
-ice,16,Iced Strawberry Tea,8,10,12
-ice,17,Iced Peach Tea,8,10,12
-ice,18,Iced Pink Lemonade,8,10,12
-natural,1,Carrot Juice,7,9,11
-natural,2,Orange Juice,7,9,11
-natural,3,Pomegranate Juice,7,9,11
-natural,4,Apple Juice,7,9,11
-natural,5,Lemon Mint Juice,8,10,12
-natural,6,Lemonade,7,9,11
-natural,7,Beetroot & Carrot Juice,8,9,11
-natural,8,"Beetroot, Carrot & Ginger Juice",9,11,14
-natural,9,"Beetroot, Carrot & Apple Juice",9,11,14
-smoothie,1,Strawberry Smoothie,8,10,12
-smoothie,2,Strawberry Lemon Smoothie,8,10,12
-smoothie,3,Mango Smoothie,8,10,12
-smoothie,4,Pineapple Smoothie,8,10,12
-smoothie,5,Miss Flora Smoothie,8,10,12
-smoothie,6,Mixed Berry Smoothie,8,10,12
-smoothie,7,House Special Mix (with Basil),10,12,14
-milkeshake,1,Nutella Milkshake,12,14,16
-milkeshake,2,Oreo Milkshake,12,14,16
-milkeshake,3,Cerelac Milkshake,12,14,16
-milkeshake ,4,Strawberry Milkshake,12,14,16
-milkeshake ,5,Cheesecake Milkshake,12,14,16
-milkeshake ,6,Dubai Milkshake,12,14,16
-milkeshake ,7,Lotus Milkshake,12,14,16
-milkeshake,8,Citrus Milkshake,12,14,16
-milkeshake,9,Pistachio Milkshake,12,14,16
-milkeshake,10,Snickers Milkshake,12,14,16
-milkeshake ,11,Caramel Milkshake,12,14,16
-mojito ,1,Strawberry Mojito,,,14
-mojito ,2,Pineapple Mojito,,,14
-mojito ,3,Watermelon Mojito,,,14
-mojito ,4,Miss Flora Mojito,,,14
-mojito ,5,Blue Curacao Mojito,,,14
-mojito ,6,Bubble Gum Mojito,,,14
-mojito ,7,Mixed Berry Mojito,,,14
-mojito ,8,Citrus Mojito,,,14
-mojito ,9,House Sweet Mojito,,,15
-hot,1,Single Espresso,4,6,8
-hot,2,Double Espresso,6,8,10
-hot,3,Americano,8,10,12
-hot,4,Nescafe,5,7,9
-hot,5,Cappuccino,7,9,12
-hot,6,French Vanilla,7,9,11
-hot,7,Hot Chocolate,8,10,12
-hot,8,Snickers Hot Chocolate,9,11,13
-hot,9,Hazelnut Hot Chocolate,9,11,13
-hot,10,Dark Hot Chocolate,9,11,13
-hot,11,Hot Mocha,10,12,14
-hot,12,Hot Mocha Diet,10,12,14
-hot,13,Hot Caramel,8,10,12
-hot,14,Hot Lotus,8,10,12
-hot,15,Hot Cerelac,10,12,14
-hot,16,Hot Spanish Latte,10,12,14
-hot,17,Hot French Latte,8,10,12
-hot,18,Vanilla Latte,8,10,12
-hot,19,Caramel Latte,8,10,12
-hot,20,Pistachio Latte,8,10,12
-hot,21,Tea,4,6,8
-hot,22,Salted Caramel,8,10,12
-cocktail,1,Fruit Cocktail,8,10,12
-cocktail,2,Nut Cocktail,10,12,14
-cocktail,3,Banana Milk,8,10,12
-cocktail,4,"Banana, Milk & Oats",9,11,13
-cocktail,5,"Banana, Milk & Dates",9,11,13
-healthy,1,Iced Coffee Diet,,,
-healthy,2,Caramel Latte Sugar-Free,10,12,14
-healthy,3,Hazelnut Latte Sugar-Free,10,12,14
-healthy,4,Vanilla Latte Sugar-Free,10,12,14
+ايس,1,ايس لاتيه ,8,10,12
+ايس,2,ايس سبنش لاتيه ,12,14,16
+ايس,3,ايس ستروبري سبنش لاتيه ,12,14,16
+ايس,4,ايس بلو كرساولاتيه ,12,14,16
+ايس,5,ايس موكا لاتيه ,12,14,16
+ايس,6,ايس وايت موكا ,12,14,16
+ايس,7,ايس دارك موكا ,12,14,16
+ايس,8,ايس كوفي ,7,9,11
+ايس,9,ايس كوفي دايت ,,,
+ايس,10,ايس امريكانو ,8,10,12
+ايس,11,ايس فنيلا لاتيه ,10,12,14
+ايس,12,ايس هيزلنت لاتيه ,10,12,14
+ايس,13,ايس كراميل لاتيه ,10,12,14
+ايس,14,ايس نوتيلا ,12,14,16
+ايس,15,ايس كراميل مكياتو ,10,12,14
+ايس,16,ايس تي فراوله ,8,10,12
+ايس,17,ايس تي خوخ,8,10,12
+ايس,18,ايس بينك لامونادا,8,10,12
+طبيعي,1,جزر,7,9,11
+طبيعي,2,برتقال ,7,9,11
+طبيعي,3,رمان ,7,9,11
+طبيعي,4,تفاح ,7,9,11
+طبيعي,5,ليمون ونعنع,8,10,12
+طبيعي,6,لامونادا,7,9,11
+طبيعي,7,شمندر وجزر ,8,9,11
+طبيعي,8,شمندر وجزر وزنجبيل ,9,11,14
+طبيعي,9,شمندر وجزر وتفاح ,9,11,14
+سموذي,1,فراوله ,8,10,12
+سموذي,2,فراوله و ليمون ,8,10,12
+سموذي,3,منجا ,8,10,12
+سموذي,4,انناس ,8,10,12
+سموذي,5,مس فلورا ,8,10,12
+سموذي,6,مكس بيري ,8,10,12
+سموذي,7,مكس ب اسم المحل (مع ريحان ,10,12,14
+ميلك شيك ,1,ميلك شيك نوتيلا ,12,14,16
+ميلك شيك ,2,ميلك شيك اوريو ,12,14,16
+ميلك شيك ,3,ميلك شيك سيريلاك ,12,14,16
+ميلك شيك ,4,ميلك شيك فراوله ,12,14,16
+ميلك شيك ,5,ميلك شيك تشيزكيك,12,14,16
+ميلك شيك ,6,ميلك شيك دبي ,12,14,16
+ميلك شيك ,7,ميلك شيك لوتس ,12,14,16
+ميلك شيك ,8,ميلك شيك حوامض,12,14,16
+ميلك شيك ,9,ميلك شيك بستاشيو ,12,14,16
+ميلك شيك ,10,ميلك شيك سنكرز,12,14,16
+ميلك شيك ,11,ميلك شيك كراميل ,12,14,16
+موهيتو ,1,مهيتو فراوله ,,,14
+موهيتو ,2,مهيتو انناس ,,,14
+موهيتو ,3,مهيتو بطيخ ,,,14
+موهيتو ,4,مهيتو مس قلورا ,,,14
+موهيتو ,5,مهيتو بلو كرساو,,,14
+موهيتو ,6,مهيتو ببل جيم ,,,14
+موهيتو ,7,مهيتو مكس بيري ,,,14
+موهيتو ,8,مهيتو حوامض ,,,14
+موهيتو ,9,مهيتو حلو (اسم المحل ),,,15
+هوت,1,اسبرسو سنجل ,4,6,8
+هوت,2,اسبرسو دبل,6,8,10
+هوت,3,امريكانو,8,10,12
+هوت,4,نسكافيه ,5,7,9
+هوت,5,كابتشينو,7,9,12
+هوت,6,فرنش فنيلا,7,9,11
+هوت,7,هوت شوكلت,8,10,12
+هوت,8,هوت شوكلت سنكرز ,9,11,13
+هوت,9,هوت شوكلت بالبندق ,9,11,13
+هوت,10,هوت شوكلت دارك ,9,11,13
+هوت,11,هوت موكا,10,12,14
+هوت,12,هوت موكا دايت ,10,12,14
+هوت,13,هوت كرميل,8,10,12
+هوت,14,هوت لوتس ,8,10,12
+هوت,15,هوت سيرلاك ,10,12,14
+هوت,16,هوت سبانش لاتيه,10,12,14
+هوت,17,هوت فرنش لاتيه ,8,10,12
+هوت,18,فنيلا لاتيه ,8,10,12
+هوت,19,كرميل لاتيه ,8,10,12
+هوت,20,بستاشيو لاتيه ,8,10,12
+هوت,21,شاي ,4,6,8
+هوت,22,سولتد كراميل ,8,10,12
+كوكتيل,1,كوكتيل فواكه ,8,10,12
+كوكتيل,2,كوكتيل مكسرات ,10,12,14
+كوكتيل,3,موز وحليب ,8,10,12
+كوكتيل,4,موز وحليب وشوفان ,9,11,13
+كوكتيل,5,موز وحليب وتمر ,9,11,13
+صحي,1,ايس كوفي دايت ,7,9,11
+صحي,2,لاتيه كراميل بدون سكر ,10,12,14
+صحي,3,لاتيه بندق بدون سكر ,10,12,14
+صحي,4,لاتيه فنيلاا بدون سكر ,10,12,14
