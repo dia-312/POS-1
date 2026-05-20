@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useOrdersStore } from "../store/useOrdersStore";
 import { deleteSale } from "../lib/database";
+import { useAuthStore } from "../store/useAuthStore";
+import toast from "react-hot-toast";
 
 export default function Orders() {
   const { orders, setOrders } = useOrdersStore();
+  const { user } = useAuthStore();
 
   const [selectedOrder, setSelectedOrder] =
     useState<number | null>(null);
@@ -13,6 +16,11 @@ export default function Orders() {
   );
 
   const handleDelete = async (id: number) => {
+    if (user?.role !== "admin") {
+      toast.error("Unauthorized: Only admins can delete orders.");
+      return;
+    }
+
     try {
       console.log("DELETE CLICKED:", id);
 
@@ -38,8 +46,10 @@ export default function Orders() {
         setSelectedOrder(null);
       }
 
+      toast.success("Order deleted successfully");
       console.log("DELETE DONE");
     } catch (err) {
+      toast.error("Failed to delete order");
       console.error("DELETE ERROR:", err);
     }
   };
@@ -170,14 +180,16 @@ export default function Orders() {
                 View
               </button>
 
-              <button
-                onClick={() =>
-                  handleDelete(order.id)
-                }
-                className="bg-red-600 text-white px-3 py-1 rounded"
-              >
-                Delete
-              </button>
+              {user?.role === "admin" && (
+                <button
+                  onClick={() =>
+                    handleDelete(order.id)
+                  }
+                  className="bg-red-600 text-white px-3 py-1 rounded"
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </div>
         ))}

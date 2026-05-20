@@ -302,9 +302,19 @@ export default function Cashier() {
           {cart.map((item) => (
             <div key={`${item.id}-${item.selectedSize}`} className="bg-stone-50 dark:bg-stone-800/30 p-3 rounded-xl border border-stone-100 dark:border-stone-800">
 
-              <p className="font-semibold text-stone-900 dark:text-stone-50">
-                {item.name} {item.selectedSize && `(${item.selectedSize})`}
-              </p>
+              <div className="flex justify-between items-start">
+                <div className="pr-2">
+                  <p className="font-semibold text-stone-900 dark:text-stone-50 leading-tight">
+                    {item.name} {item.selectedSize && `(${item.selectedSize})`}
+                  </p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                    ₪{item.price.toFixed(2)} each
+                  </p>
+                </div>
+                <span className="font-semibold text-stone-950 dark:text-stone-50 whitespace-nowrap">
+                  ₪{(item.price * item.quantity).toFixed(2)}
+                </span>
+              </div>
 
               <textarea
                 placeholder="Add note..."
