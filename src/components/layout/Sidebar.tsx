@@ -22,16 +22,16 @@ export default function Sidebar() {
     ...(user?.role === "admin"
       ? [
           {
-            name: "Dashboard",
+            name: "لوحة التحكم",
             path: "/",
           },
 
           {
-            name: "Users",
+            name: "المستخدمين",
             path: "/users",
           },
           {
-            name: "Reports",
+            name: "التقارير",
             path: "/reports",
           },
         ]
@@ -40,36 +40,36 @@ export default function Sidebar() {
     /* ALL USERS */
 
     {
-      name: "Cashier",
+      name: "الكاشير",
       path: "/cashier",
     },
 
     {
-      name: "Products",
+      name: "المنتجات",
       path: "/products",
     },
 
     {
-      name: "Orders",
+      name: "الطلبات",
       path: "/orders",
     },
 
     {
-      name: "Expenses",
+      name: "المصاريف",
       path: "/expenses",
     },
 
     {
-      name: "Settings",
+      name: "الإعدادات",
       path: "/settings",
     },
   ];
 
   return (
-    <div className="w-64 bg-stone-100 dark:bg-stone-950 border-r border-stone-200 dark:border-stone-800 p-4 flex flex-col">
+    <div className="w-64 bg-stone-100 dark:bg-stone-950 border-e border-stone-200 dark:border-stone-800 p-4 flex flex-col">
       <div>
         <h1 className="text-stone-900 dark:text-white text-2xl font-bold mb-10">
-          POS SYSTEM
+          نظام المبيعات
         </h1>
 
         <div className="flex flex-col gap-2">
@@ -99,9 +99,9 @@ export default function Sidebar() {
 
           navigate("/login");
         }}
-        className="mt-auto text-red-400 hover:text-red-300 px-4 py-3 text-left"
+        className="mt-auto text-red-400 hover:text-red-300 px-4 py-3 text-start"
       >
-        Logout
+        تسجيل الخروج
       </button>
     </div>
   );

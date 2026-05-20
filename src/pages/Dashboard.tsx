@@ -60,14 +60,14 @@ export default function Dashboard() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
-        Dashboard
+        لوحة التحكم
       </h1>
 
       {/* STATS */}
       <div className="grid grid-cols-3 gap-6 mb-6">
         <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
           <p className="text-stone-500 dark:text-stone-400 mb-2">
-            Revenue
+            صافي الإيرادات
           </p>
           <h2 className="text-4xl font-bold text-stone-900 dark:text-white">
             ₪{stats.revenue.toFixed(2)}
@@ -76,7 +76,7 @@ export default function Dashboard() {
 
         <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
           <p className="text-stone-500 dark:text-stone-400 mb-2">
-            Orders
+            الطلبات
           </p>
           <h2 className="text-4xl font-bold text-stone-900 dark:text-white">
             {stats.orders}
@@ -85,7 +85,7 @@ export default function Dashboard() {
 
         <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
           <p className="text-stone-500 dark:text-stone-400 mb-2">
-            Products
+            المنتجات
           </p>
           <h2 className="text-4xl font-bold text-stone-900 dark:text-white">
             {stats.products}
@@ -96,7 +96,7 @@ export default function Dashboard() {
       {/* CHART */}
       <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6">
         <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-6">
-          Sales Analytics
+          تحليلات المبيعات
         </h2>
 
         <div className="h-[400px]">
@@ -119,7 +119,7 @@ export default function Dashboard() {
       {/* LOW STOCK */}
       <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6 mt-6">
         <h2 className="text-2xl font-bold text-stone-900 dark:text-white mb-6">
-          Low Stock Alerts
+          تنبيهات نقص المخزون
         </h2>
 
         <div className="space-y-4">
@@ -133,19 +133,19 @@ export default function Dashboard() {
                   {product.name}
                 </p>
                 <p className="text-stone-500 dark:text-stone-400">
-                  Product ID: {product.id}
+                  معرف المنتج: {product.id}
                 </p>
               </div>
 
               <div className="text-red-400 font-bold text-xl">
-                {product.stock} Left
+                متبقي {product.stock}
               </div>
             </div>
           ))}
 
           {lowStock.length === 0 && (
             <p className="text-stone-500 dark:text-stone-400">
-              No Low Stock Alerts
+              لا توجد تنبيهات لنقص المخزون
             </p>
           )}
         </div>

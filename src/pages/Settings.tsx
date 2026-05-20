@@ -21,25 +21,25 @@ export default function Settings() {
       if (selected && typeof selected === 'string') {
         const contents = await readTextFile(selected);
         await importDatabase(contents);
-        toast.success("Database restored successfully! Reloading...");
+        toast.success("تمت استعادة قاعدة البيانات بنجاح! جاري إعادة التحميل...");
         setTimeout(() => {
           window.location.reload();
         }, 1500);
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to restore database");
+      toast.error("فشلت استعادة قاعدة البيانات");
     }
   };
 
   const handleManualBackup = async () => {
-    toast.loading("Creating backup...");
+    toast.loading("جاري إنشاء نسخة احتياطية...");
     const success = await performAutomaticBackup(true);
     toast.dismiss();
     if (success) {
-      toast.success("Backup saved to Documents/POS_Backups");
+      toast.success("تم حفظ النسخة الاحتياطية في Documents/POS_Backups");
     } else {
-      toast.error("Failed to create backup");
+      toast.error("فشل إنشاء النسخة الاحتياطية");
     }
   };
 
@@ -47,30 +47,30 @@ export default function Settings() {
     <div className="h-full flex flex-col gap-6">
       <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-6">
         <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
-          Settings
+          الإعدادات
         </h1>
 
         <div className="flex items-center justify-between py-4 border-b border-stone-200 dark:border-stone-700">
           <div>
-            <h2 className="text-xl font-semibold text-stone-900 dark:text-white">Appearance</h2>
-            <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">Switch between light and dark themes</p>
+            <h2 className="text-xl font-semibold text-stone-900 dark:text-white">المظهر</h2>
+            <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">التبديل بين المظهر الفاتح والداكن</p>
           </div>
           
           <button
             onClick={toggleTheme}
             className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium transition shadow-sm"
           >
-            Switch to {theme === 'light' ? 'Dark' : 'Light'} Mode
+            التبديل إلى الوضع {theme === 'light' ? 'الداكن' : 'الفاتح'}
           </button>
         </div>
 
         {/* DATA MANAGEMENT */}
         <div className="flex items-center justify-between py-4 border-b border-stone-200 dark:border-stone-700">
           <div>
-            <h2 className="text-xl font-semibold text-stone-900 dark:text-white">Data Management</h2>
+            <h2 className="text-xl font-semibold text-stone-900 dark:text-white">إدارة البيانات</h2>
             <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">
-              Automatic backups are saved daily to <b>Documents/POS_Backups</b>.<br/>
-              You can manually trigger a backup or restore from a previous backup file.
+              يتم حفظ النسخ الاحتياطية تلقائيًا يوميًا في المجلد <b>Documents/POS_Backups</b>.<br/>
+              يمكنك عمل نسخة احتياطية يدوية الآن أو استعادة البيانات من ملف نسخة احتياطية سابق.
             </p>
           </div>
           
@@ -79,14 +79,14 @@ export default function Settings() {
               onClick={handleManualBackup}
               className="px-6 py-3 bg-stone-200 hover:bg-stone-300 dark:bg-stone-700 dark:hover:bg-stone-600 text-stone-900 dark:text-white rounded-xl font-medium transition shadow-sm"
             >
-              Backup Now
+              نسخ احتياطي الآن
             </button>
 
             <button
               onClick={handleRestore}
               className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition shadow-sm"
             >
-              Restore Data
+              استعادة البيانات
             </button>
           </div>
         </div>

@@ -42,7 +42,7 @@ export default function Expenses() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
-        Expenses
+        المصاريف
       </h1>
 
       {/* FORM */}
@@ -54,7 +54,7 @@ export default function Expenses() {
             onChange={(e) =>
               setTitle(e.target.value)
             }
-            placeholder="Expense Title"
+            placeholder="اسم المصروف"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
@@ -64,7 +64,7 @@ export default function Expenses() {
             onChange={(e) =>
               setAmount(e.target.value)
             }
-            placeholder="Amount"
+            placeholder="القيمة"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
         </div>
@@ -73,7 +73,7 @@ export default function Expenses() {
           onClick={handleAddExpense}
           className="mt-4 bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
         >
-          Add Expense
+          إضافة مصروف
         </button>
       </div>
 
@@ -83,16 +83,16 @@ export default function Expenses() {
         <table className="w-full">
           <thead className="bg-stone-50 dark:bg-stone-900">
             <tr>
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Title
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                اسم المصروف
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Amount
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                القيمة
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Date
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                التاريخ
               </th>
             </tr>
           </thead>

@@ -65,7 +65,7 @@ export default function Users() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
-        Users
+        المستخدمين
       </h1>
 
       {/* FORM */}
@@ -77,7 +77,7 @@ export default function Users() {
             onChange={(e) =>
               setUsername(e.target.value)
             }
-            placeholder="Username"
+            placeholder="اسم المستخدم"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
@@ -86,7 +86,7 @@ export default function Users() {
             onChange={(e) =>
               setPassword(e.target.value)
             }
-            placeholder="Password"
+            placeholder="كلمة المرور"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
@@ -95,7 +95,7 @@ export default function Users() {
             onChange={(e) =>
               setPin(e.target.value)
             }
-            placeholder="PIN Code"
+            placeholder="رمز PIN"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
@@ -107,11 +107,11 @@ export default function Users() {
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           >
             <option value="cashier">
-              Cashier
+              كاشير
             </option>
 
             <option value="admin">
-              Admin
+              مسؤول
             </option>
           </select>
         </div>
@@ -120,7 +120,7 @@ export default function Users() {
           onClick={handleAddUser}
           className="mt-4 bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
         >
-          Add User
+          إضافة مستخدم
         </button>
       </div>
 
@@ -130,20 +130,20 @@ export default function Users() {
         <table className="w-full">
           <thead className="bg-stone-50 dark:bg-stone-900">
             <tr>
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                ID
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                المعرف
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Username
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                اسم المستخدم
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Role
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                الصلاحية
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Action
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                العمليات
               </th>
             </tr>
           </thead>
@@ -163,7 +163,7 @@ export default function Users() {
                 </td>
 
                 <td className="p-4 text-stone-900 dark:text-white">
-                  {user.role}
+                  {user.role === "admin" ? "مسؤول" : "كاشير"}
                 </td>
 
                 <td className="p-4">
@@ -174,7 +174,7 @@ export default function Users() {
                     }
                     className="bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
-                    Delete
+                    حذف
                   </button>
                   )}
                 </td>

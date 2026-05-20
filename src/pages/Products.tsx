@@ -105,7 +105,7 @@ export default function Products() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-stone-900 dark:text-white mb-6">
-        Products
+        المنتجات
       </h1>
 
       {/* FORM */}
@@ -117,7 +117,7 @@ export default function Products() {
             onChange={(e) =>
               setName(e.target.value)
             }
-            placeholder="Product Name"
+            placeholder="اسم المنتج"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
@@ -126,7 +126,7 @@ export default function Products() {
             onChange={(e) =>
               setStock(e.target.value)
             }
-            placeholder="Stock"
+            placeholder="الكمية في المخزن"
             type="number"
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
@@ -140,30 +140,30 @@ export default function Products() {
             }
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           >
-            <option value="Ice">Ice</option>
-            <option value="Natural">Natural</option>
-            <option value="Smoothie">Smoothie</option>
-            <option value="Milkeshake">Milkeshake</option>
-            <option value="Mojito">Mojito</option>
-            <option value="Hot">Hot</option>
-            <option value="Cocktail">Cocktail</option>
-            <option value="Healthy">Healthy</option>
-            <option value="Smoke">Smoke</option>
-            <option value="Snacks">Snacks</option>
-            <option value="Desserts">Desserts</option>
+            <option value="Ice">بارد</option>
+            <option value="Natural">طبيعي</option>
+            <option value="Smoothie">سموذي</option>
+            <option value="Milkeshake">ميلك شيك</option>
+            <option value="Mojito">موهيتو</option>
+            <option value="Hot">ساخن</option>
+            <option value="Cocktail">كوكتيل</option>
+            <option value="Healthy">صحي</option>
+            <option value="Smoke">سموك</option>
+            <option value="Snacks">سناكس</option>
+            <option value="Desserts">حلويات</option>
           </select>
 
           {/* SIZES */}
 
           <div className="space-y-3">
             <h3 className="text-stone-900 dark:text-white font-semibold">
-              Sizes & Prices
+              الأحجام والأسعار
             </h3>
 
             {sizes.map((item, index) => (
                 <div key={index} className="flex gap-3 items-center">
                   <input
-                    placeholder="Size"
+                    placeholder="الحجم (مثال: كبير، وسط)"
                     value={item.size}
                     onChange={(e) => {
                       const updated = [...sizes];
@@ -175,7 +175,7 @@ export default function Products() {
 
                   <input
                     type="number"
-                    placeholder="Price"
+                    placeholder="السعر"
                     value={item.price}
                     onChange={(e) => {
                       const updated = [...sizes];
@@ -193,7 +193,7 @@ export default function Products() {
                         setSizes(updated);
                       }}
                       className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-lg transition-colors flex items-center justify-center"
-                      title="Remove Size"
+                      title="إزالة الحجم"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                     </button>
@@ -214,7 +214,7 @@ export default function Products() {
               }
               className="bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
             >
-              Add Size
+              إضافة حجم
             </button>
           </div>
         </div>
@@ -224,8 +224,8 @@ export default function Products() {
           className="mt-6 bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
         >
           {editingId
-            ? "Update Product"
-            : "Add Product"}
+            ? "تحديث المنتج"
+            : "إضافة منتج"}
         </button>
       </div>
 
@@ -235,24 +235,24 @@ export default function Products() {
         <table className="w-full">
           <thead className="bg-stone-50 dark:bg-stone-900">
             <tr>
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                ID
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                المعرف
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Name
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                الاسم
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Sizes
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                الأحجام والأسعار
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Stock
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                المخزون
               </th>
 
-              <th className="text-left p-4 text-stone-600 dark:text-stone-300">
-                Action
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                العمليات
               </th>
             </tr>
           </thead>
@@ -307,7 +307,7 @@ export default function Products() {
                     }
                     className="bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
-                    Delete
+                    حذف
                   </button>
 
                   <button
@@ -340,7 +340,7 @@ export default function Products() {
                     }}
                     className="bg-yellow-600 hover:bg-yellow-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
-                    Edit
+                    تعديل
                   </button>
                 </td>
               </tr>

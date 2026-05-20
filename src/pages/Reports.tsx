@@ -37,7 +37,7 @@ export default function Reports() {
     <div className="flex flex-col h-full gap-6">
       <div className="flex justify-between items-center mb-2">
         <h1 className="text-3xl font-bold text-stone-900 dark:text-white">
-          Monthly Reports
+          التقارير الشهرية
         </h1>
       </div>
 
@@ -48,7 +48,7 @@ export default function Reports() {
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
           <div>
-            <p className="text-stone-500 dark:text-stone-400 text-sm font-medium">All-Time Revenue</p>
+            <p className="text-stone-500 dark:text-stone-400 text-sm font-medium">إجمالي الإيرادات</p>
             <h3 className="text-2xl font-bold text-stone-900 dark:text-white">₪{allTimeRevenue.toFixed(2)}</h3>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function Reports() {
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" /></svg>
           </div>
           <div>
-            <p className="text-stone-500 dark:text-stone-400 text-sm font-medium">All-Time Expenses</p>
+            <p className="text-stone-500 dark:text-stone-400 text-sm font-medium">إجمالي المصاريف</p>
             <h3 className="text-2xl font-bold text-stone-900 dark:text-white">₪{allTimeExpenses.toFixed(2)}</h3>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default function Reports() {
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
           </div>
           <div>
-            <p className="text-stone-500 dark:text-stone-400 text-sm font-medium">Net Profit</p>
+            <p className="text-stone-500 dark:text-stone-400 text-sm font-medium">صافي الأرباح</p>
             <h3 className="text-2xl font-bold text-stone-900 dark:text-white">₪{allTimeProfit.toFixed(2)}</h3>
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function Reports() {
         
         {/* CHART */}
         <div className="lg:col-span-2 bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-6 shadow-sm flex flex-col">
-          <h2 className="text-xl font-bold text-stone-900 dark:text-white mb-6">Profit Trend</h2>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white mb-6">منحنى الأرباح</h2>
           <div className="flex-1 min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
@@ -90,8 +90,8 @@ export default function Reports() {
                   contentStyle={{ backgroundColor: '#1c1917', borderColor: '#444', color: '#fff', borderRadius: '8px' }}
                   itemStyle={{ color: '#fff' }}
                 />
-                <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="Profit" />
-                <Line type="monotone" dataKey="revenue" stroke="#d97706" strokeWidth={2} opacity={0.5} name="Revenue" />
+                <Line type="monotone" dataKey="profit" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="الأرباح" />
+                <Line type="monotone" dataKey="revenue" stroke="#d97706" strokeWidth={2} opacity={0.5} name="الإيرادات" />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -99,7 +99,7 @@ export default function Reports() {
 
         {/* TABLE */}
         <div className="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-6 shadow-sm flex flex-col overflow-hidden">
-          <h2 className="text-xl font-bold text-stone-900 dark:text-white mb-6">Monthly Breakdown</h2>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white mb-6">التفصيل الشهري</h2>
           
           <div className="flex-1 overflow-auto pr-2">
             <div className="space-y-3">
@@ -108,22 +108,22 @@ export default function Reports() {
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="font-bold text-stone-900 dark:text-white text-lg">{report.month}</h3>
                     <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-400 px-2 py-1 rounded-md font-medium">
-                      {report.orders} Orders
+                      {report.orders} طلبات
                     </span>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <p className="text-stone-500 dark:text-stone-400">Revenue</p>
+                      <p className="text-stone-500 dark:text-stone-400">الإيرادات</p>
                       <p className="font-semibold text-stone-900 dark:text-white">₪{report.revenue.toFixed(2)}</p>
                     </div>
                     <div>
-                      <p className="text-stone-500 dark:text-stone-400">Expenses</p>
+                      <p className="text-stone-500 dark:text-stone-400">المصاريف</p>
                       <p className="font-semibold text-red-500">₪{report.expenses.toFixed(2)}</p>
                     </div>
                     <div className="col-span-2 mt-1 pt-2 border-t border-stone-200 dark:border-stone-700">
                       <div className="flex justify-between items-center">
-                        <p className="text-stone-500 dark:text-stone-400 font-medium">Profit</p>
+                        <p className="text-stone-500 dark:text-stone-400 font-medium">الأرباح</p>
                         <p className={`font-bold text-lg ${report.profit >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                           ₪{report.profit.toFixed(2)}
                         </p>
@@ -135,7 +135,7 @@ export default function Reports() {
 
               {reports.length === 0 && (
                 <div className="text-center py-10 text-stone-500 dark:text-stone-400">
-                  No monthly data available yet.
+                  لا توجد بيانات شهرية متاحة بعد.
                 </div>
               )}
             </div>

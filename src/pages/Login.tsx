@@ -33,7 +33,7 @@ export default function Login() {
     );
 
     if (!user) {
-      alert("Invalid credentials");
+      alert("اسم المستخدم أو كلمة المرور غير صحيحة");
 
       return;
     }
@@ -51,7 +51,7 @@ export default function Login() {
         await loginWithPin(pin);
 
       if (!user) {
-        alert("Invalid PIN");
+        alert("رمز PIN غير صحيح");
 
         return;
       }
@@ -65,13 +65,13 @@ export default function Login() {
     <div className="h-screen flex items-center justify-center bg-stone-100 dark:bg-stone-950">
       <div className="bg-stone-50 dark:bg-stone-900 p-8 rounded-2xl w-96 border border-stone-200 dark:border-stone-800">
         <h1 className="text-stone-900 dark:text-white text-3xl mb-6 font-bold">
-          POS Login
+          تسجيل الدخول
         </h1>
 
         {/* USERNAME */}
 
         <input
-          placeholder="Username"
+          placeholder="اسم المستخدم"
           value={username}
           className="w-full mb-3 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
           onChange={(e) =>
@@ -85,7 +85,7 @@ export default function Login() {
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder="كلمة المرور"
           value={password}
           className="w-full mb-5 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
           onChange={(e) =>
@@ -101,18 +101,18 @@ export default function Login() {
           onClick={handleLogin}
           className="w-full bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white p-3 rounded"
         >
-          Login
+          تسجيل الدخول
         </button>
 
         {/* PIN LOGIN */}
 
         <div className="mt-6 border-t border-stone-200 dark:border-stone-700 pt-6">
           <h2 className="text-stone-900 dark:text-white mb-3">
-            Quick PIN Login
+            تسجيل دخول سريع برمز PIN
           </h2>
 
           <input
-            placeholder="PIN"
+            placeholder="رمز PIN"
             value={pin}
             onChange={(e) =>
               setPin(e.target.value)
@@ -126,7 +126,7 @@ export default function Login() {
             }
             className="w-full bg-green-600 hover:bg-green-700 text-stone-900 dark:text-white p-3 rounded"
           >
-            Login With PIN
+            دخول بواسطة PIN
           </button>
         </div>
       </div>

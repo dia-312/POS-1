@@ -5,6 +5,21 @@ import toast from "react-hot-toast";
 import CheckoutModal from "../components/ui/CheckoutModal";
 import { useOrdersStore } from "../store/useOrdersStore";
 
+const CATEGORIES = [
+  { id: "All", name: "الكل" },
+  { id: "Ice", name: "بارد" },
+  { id: "Natural", name: "طبيعي" },
+  { id: "Smoothie", name: "سموذي" },
+  { id: "Milkeshake", name: "ميلك شيك" },
+  { id: "Mojito", name: "موهيتو" },
+  { id: "Hot", name: "ساخن" },
+  { id: "Cocktail", name: "كوكتيل" },
+  { id: "Healthy", name: "صحي" },
+  { id: "Smoke", name: "سموك" },
+  { id: "Snacks", name: "سناكس" },
+  { id: "Desserts", name: "حلويات" },
+];
+
 export default function Cashier() {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<any[]>([]);
@@ -34,7 +49,7 @@ export default function Cashier() {
 
     const matchesCategory =
       selectedCategory === "All" ||
-      product.category === selectedCategory;
+      (product.category && product.category.trim().toLowerCase() === selectedCategory.toLowerCase());
 
     return matchesSearch && matchesCategory;
   });
@@ -62,7 +77,7 @@ export default function Cashier() {
     addOrder(orderData);
 
     const receiptHTML = `
-      <p>Order ID: #${orderData.id}</p>
+      <p>رقم الطلب: #${orderData.id}</p>
       <p>${new Date(orderData.createdAt).toLocaleString()}</p>
       <hr />
 
@@ -83,7 +98,7 @@ export default function Cashier() {
 
             ${
               item.note
-                ? `<div class="note">Note: ${item.note}</div>`
+                ? `<div class="note">ملاحظة: ${item.note}</div>`
                 : ""
             }
           </div>
@@ -93,11 +108,11 @@ export default function Cashier() {
 
       <hr />
 
-      <p>Subtotal: ₪${subtotal.toFixed(2)}</p>
-      <p>Discount: ${discount}%</p>
+      <p>المجموع الفرعي: ₪${subtotal.toFixed(2)}</p>
+      <p>الخصم: ${discount}%</p>
 
       <div class="total">
-        <span>Total</span>
+        <span>الإجمالي</span>
         <span>₪${orderData.total.toFixed(2)}</span>
       </div>
     `;
@@ -105,9 +120,9 @@ export default function Cashier() {
     const fullHtml = `
       <html>
         <head>
-          <title>ORDER</title>
+          <title>الطلب</title>
           <style>
-            body { font-family: Arial; padding: 20px; color: black; }
+            body { font-family: Arial; padding: 20px; color: black; direction: rtl; }
             h1 { text-align: center; margin-bottom: 5px; }
             h2 { text-align: center; font-size: 14px; color: #555; }
             .item { margin: 10px 0; border-bottom: 1px dashed #ccc; padding-bottom: 8px; }
@@ -120,13 +135,13 @@ export default function Cashier() {
 
         <body>
           <h1>MOOD YARD</h1>
-          <h2>(Customer Copy)</h2>
+          <h2>(نسخة الزبون)</h2>
           ${receiptHTML}
 
           <div class="page-break"></div>
 
           <h1>MOOD YARD</h1>
-          <h2>(Barista Copy)</h2>
+          <h2>(نسخة الباريستا)</h2>
           ${receiptHTML}
         </body>
       </html>
@@ -151,7 +166,7 @@ export default function Cashier() {
       }, 1000);
     }
 
-    toast.success("Order Created Successfully");
+    toast.success("تم إنشاء الطلب بنجاح");
 
     clearCart();
     setDiscount(0);
@@ -173,11 +188,11 @@ export default function Cashier() {
       {/* PRODUCTS */}
       <div className="flex-1 flex flex-col">
 
-        <h1 className="text-3xl font-bold mb-4 text-stone-900 dark:text-stone-50">Cashier</h1>
+        <h1 className="text-3xl font-bold mb-4 text-stone-900 dark:text-stone-50">الكاشير</h1>
 
         <input
           type="text"
-          placeholder="Search products..."
+          placeholder="ابحث عن منتجات..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl px-5 py-4 mb-4 text-stone-900 dark:text-stone-50 focus:outline-none focus:border-amber-500"
@@ -195,7 +210,7 @@ export default function Cashier() {
                   : "bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700"
               }`}
             >
-              {d === 0 ? "No Discount" : `${d}%`}
+              {d === 0 ? "بدون خصم" : `%${d} خصم`}
             </button>
           ))}
 
@@ -209,30 +224,17 @@ export default function Cashier() {
 
         {/* CATEGORIES */}
         <div className="flex gap-3 flex-wrap mb-4">
-          {[
-            "All",
-            "Ice",
-            "Natural",
-            "Smoothie",
-            "Milkeshake",
-            "Mojito",
-            "Hot",
-            "Cocktail",
-            "Healthy",
-            "Smoke",
-            "Snacks",
-            "Desserts",
-          ].map((cat) => (
+          {CATEGORIES.map((cat) => (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
               className={`px-4 py-2 rounded-xl transition-colors ${
-                selectedCategory === cat
+                selectedCategory === cat.id
                   ? "bg-amber-600 text-white"
                   : "bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700"
               }`}
             >
-              {cat}
+              {cat.name}
             </button>
           ))}
         </div>
@@ -284,7 +286,7 @@ export default function Cashier() {
                     }
                     className="mt-2 w-full bg-amber-600 text-white py-2 rounded"
                   >
-                    Add To Cart
+                    إضافة للسلة
                   </button>
                 )}
               </div>
@@ -296,7 +298,7 @@ export default function Cashier() {
       {/* CART */}
       <div className="w-[340px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 rounded-2xl flex flex-col">
 
-        <h2 className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50">Current Order</h2>
+        <h2 className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50">الطلب الحالي</h2>
 
         <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-2">
           {cart.map((item) => (
@@ -308,7 +310,7 @@ export default function Cashier() {
                     {item.name} {item.selectedSize && `(${item.selectedSize})`}
                   </p>
                   <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                    ₪{item.price.toFixed(2)} each
+                    ₪{item.price.toFixed(2)} للقطعة
                   </p>
                 </div>
                 <span className="font-semibold text-stone-950 dark:text-stone-50 whitespace-nowrap">
@@ -317,7 +319,7 @@ export default function Cashier() {
               </div>
 
               <textarea
-                placeholder="Add note..."
+                placeholder="إضافة ملاحظة..."
                 className="w-full mt-1 p-2 text-sm border border-stone-200 dark:border-stone-800 rounded-lg bg-stone-50 dark:bg-stone-800/50 text-stone-900 dark:text-stone-50 focus:outline-none focus:border-amber-500 resize-none h-12"
                 value={item.note || ""}
                 onChange={(e) =>
@@ -340,7 +342,7 @@ export default function Cashier() {
                   onClick={() => removeFromCart(item.id, item.selectedSize)}
                   className="text-red-500 text-sm hover:underline font-medium"
                 >
-                  Remove
+                  حذف
                 </button>
               </div>
             </div>
@@ -351,19 +353,19 @@ export default function Cashier() {
         <div className="mt-auto pt-4">
           <div className="p-4 border border-stone-200 dark:border-stone-800 rounded-xl bg-stone-50 dark:bg-stone-800/50">
             <div className="flex justify-between text-sm text-stone-600 dark:text-stone-400 mb-1">
-              <span>Subtotal:</span>
+              <span>المجموع الفرعي:</span>
               <span>₪{subtotal.toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between text-sm text-red-600 dark:text-red-400 mb-2">
-              <span>Discount ({discount}%):</span>
+              <span>الخصم ({discount}%):</span>
               <span>-₪{(subtotal * (discount / 100)).toFixed(2)}</span>
             </div>
 
             <hr className="my-2 border-stone-200 dark:border-stone-700" />
 
             <div className="flex justify-between font-bold text-lg text-stone-900 dark:text-stone-50">
-              <span>Total:</span>
+              <span>الإجمالي:</span>
               <span>₪{total.toFixed(2)}</span>
             </div>
           </div>
@@ -372,7 +374,7 @@ export default function Cashier() {
             onClick={() => setCheckoutOpen(true)}
             className="w-full bg-green-600 hover:bg-green-700 text-white py-4 mt-4 rounded-xl font-bold transition-colors text-lg"
           >
-            Checkout
+            دفع وتأكيد
           </button>
         </div>
 
