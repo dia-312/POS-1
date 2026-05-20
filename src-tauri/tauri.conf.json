@@ -1,24 +1,25 @@
 {
-  
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "ORDER",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.moodyard.pos",
   "build": {
-    "frontendDist": "../build",
+    "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build"
   },
   "plugins": {
-  "sql": {
-    "preload": ["sqlite:pos.db"]
-  }
+    "sql": {
+      "preload": [
+        "sqlite:pos.db"
+      ]
+    }
   },
   "app": {
     "windows": [
       {
-        "title": "pos-system",
+        "title": "MOOD YARD",
         "width": 800,
         "height": 600,
         "resizable": true,
