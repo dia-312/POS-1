@@ -13,6 +13,7 @@ import Expenses from "../pages/Expenses";
 import Settings from "../pages/Settings";
 import Users from "../pages/Users";
 import Reports from "../pages/Reports";
+import About from "../pages/About";
 
 import ProtectedRoute from "./ProtectedRoute";
 import AdminRoute from "./AdminRoute";
@@ -102,6 +103,12 @@ export default function AppRoutes() {
             <Settings />
           </ProtectedRoute>
         }
+      />
+
+      {/* ABOUT PAGE (public) */}
+      <Route
+        path="/about"
+        element={<About />}
       />
 
       {/* FALLBACK */}
