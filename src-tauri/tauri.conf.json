@@ -12,7 +12,7 @@
   "plugins": {
     "sql": {
       "preload": [
-        "sqlite:pos.db"
+        "sqlite:pos-final.db"
       ]
     }
   },
@@ -20,14 +20,16 @@
     "windows": [
       {
         "title": "MOOD YARD",
-        "width": 800,
-        "height": 600,
+        "width": 1280,
+        "height": 800,
+        "minWidth": 1000,
+        "minHeight": 650,
         "resizable": true,
         "fullscreen": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: https://asset.localhost data:; connect-src 'self' ipc: http://ipc.localhost"
     }
   },
   "bundle": {

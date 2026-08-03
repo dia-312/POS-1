@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import {
   getProducts,
@@ -6,6 +6,9 @@ import {
   deleteProduct,
   updateProduct,
 } from "../lib/database";
+
+import ConfirmModal from "../components/ui/ConfirmModal";
+import toast from "react-hot-toast";
 
 type Product = {
   id: number;
@@ -23,6 +26,8 @@ export default function Products() {
   const [products, setProducts] =
     useState<Product[]>([]);
 
+  const [search, setSearch] = useState("");
+
   const [category, setCategory] =
     useState("Ice");
 
@@ -34,6 +39,12 @@ export default function Products() {
   const [editingId, setEditingId] =
     useState<number | null>(null);
 
+  const [deleteTarget, setDeleteTarget] =
+    useState<Product | null>(null);
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [sizes, setSizes] = useState([
     {
       size: "",
@@ -41,41 +52,26 @@ export default function Products() {
     },
   ]);
 
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const filteredProducts = products.filter((product) => {
+    const query = search.trim().toLowerCase();
+    if (!query) return true;
+
+    return (
+      product.name.toLowerCase().includes(query) ||
+      (product.category || "").toLowerCase().includes(query)
+    );
+  });
+
   async function loadProducts() {
     const result = await getProducts();
 
     setProducts(result);
   }
 
-  async function handleAddProduct() {
-    if (!name || !stock) return;
-
-    const formattedSizes = sizes.map(
-      (item) => ({
-        size: item.size,
-        price: Number(item.price),
-      })
-    );
-
-    if (editingId) {
-      await updateProduct(
-        editingId,
-        name,
-        Number(stock),
-        category,
-        formattedSizes
-      );
-
-      setEditingId(null);
-    } else {
-      await addProduct(
-        name,
-        Number(stock),
-        category,
-        formattedSizes
-      );
-    }
-
+  function resetForm() {
+    setEditingId(null);
     setName("");
     setStock("");
     setCategory("Ice");
@@ -86,16 +82,94 @@ export default function Products() {
         price: "",
       },
     ]);
-
-    loadProducts();
   }
 
-  async function handleDelete(
-    id: number
-  ) {
-    await deleteProduct(id);
+  async function handleAddProduct(e?: FormEvent) {
+    e?.preventDefault();
 
-    loadProducts();
+    if (!name || !stock || isSaving) return;
+
+    setIsSaving(true);
+
+    try {
+      const formattedSizes = sizes.map(
+        (item) => ({
+          size: item.size,
+          price: Number(item.price),
+        })
+      );
+
+      if (editingId) {
+        await updateProduct(
+          editingId,
+          name,
+          Number(stock),
+          category,
+          formattedSizes
+        );
+
+        toast.success("تم تحديث المنتج بنجاح");
+      } else {
+        await addProduct(
+          name,
+          Number(stock),
+          category,
+          formattedSizes
+        );
+
+        toast.success("تمت إضافة المنتج بنجاح");
+      }
+
+      resetForm();
+      await loadProducts();
+    } catch (err) {
+      console.error(err);
+      toast.error("حدث خطأ أثناء حفظ المنتج");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  function startEdit(product: Product) {
+    setEditingId(product.id);
+    setName(product.name);
+    setStock(product.stock.toString());
+    setCategory(product.category);
+
+    setSizes(
+      product.sizes.map((s) => ({
+        size: s.size,
+        price: s.price.toString(),
+      }))
+    );
+
+    formRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
+  async function confirmDeleteProduct() {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
+
+    try {
+      await deleteProduct(deleteTarget.id);
+
+      if (editingId === deleteTarget.id) {
+        resetForm();
+      }
+
+      await loadProducts();
+      toast.success("تم حذف المنتج بنجاح");
+    } catch (err) {
+      console.error(err);
+      toast.error("فشل حذف المنتج");
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
+    }
   }
 
   useEffect(() => {
@@ -110,7 +184,31 @@ export default function Products() {
 
       {/* FORM */}
 
-      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl border border-stone-200 dark:border-stone-700 mb-6">
+      <form
+        ref={formRef}
+        onSubmit={handleAddProduct}
+        className={`bg-white dark:bg-stone-800 p-6 rounded-2xl border mb-6 transition-colors ${
+          editingId
+            ? "border-amber-500"
+            : "border-stone-200 dark:border-stone-700"
+        }`}
+      >
+        {editingId && (
+          <div className="flex items-center justify-between mb-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3">
+            <span className="text-amber-800 dark:text-amber-300 font-medium">
+              جاري تعديل: {name || "..."}
+            </span>
+
+            <button
+              type="button"
+              onClick={resetForm}
+              className="text-amber-800 dark:text-amber-300 text-sm hover:underline"
+            >
+              إلغاء التعديل
+            </button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-4">
           <input
             value={name}
@@ -219,15 +317,40 @@ export default function Products() {
           </div>
         </div>
 
-        <button
-          onClick={handleAddProduct}
-          className="mt-6 bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
-        >
-          {editingId
-            ? "تحديث المنتج"
-            : "إضافة منتج"}
-        </button>
-      </div>
+        <div className="flex gap-3 mt-6">
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving
+              ? "جاري الحفظ..."
+              : editingId
+              ? "تحديث المنتج"
+              : "إضافة منتج"}
+          </button>
+
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="bg-stone-200 hover:bg-stone-300 dark:bg-stone-700 dark:hover:bg-stone-600 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
+            >
+              إلغاء
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* SEARCH */}
+
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="ابحث عن منتج بالاسم أو الفئة..."
+        className="w-full bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl px-5 py-4 mb-4 text-stone-900 dark:text-stone-50 focus:outline-none focus:border-amber-500"
+      />
 
       {/* TABLE */}
 
@@ -258,10 +381,14 @@ export default function Products() {
           </thead>
 
           <tbody>
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <tr
                 key={product.id}
-                className="border-b border-stone-200 dark:border-stone-700"
+                className={`border-b border-stone-200 dark:border-stone-700 ${
+                  editingId === product.id
+                    ? "bg-amber-50 dark:bg-amber-950/20"
+                    : ""
+                }`}
               >
                 <td className="p-4 text-stone-900 dark:text-white">
                   {product.id}
@@ -300,44 +427,14 @@ export default function Products() {
 
                 <td className="p-4 flex gap-2">
                   <button
-                    onClick={() =>
-                      handleDelete(
-                        product.id
-                      )
-                    }
+                    onClick={() => setDeleteTarget(product)}
                     className="bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
                     حذف
                   </button>
 
                   <button
-                    onClick={() => {
-                      setEditingId(
-                        product.id
-                      );
-
-                      setName(
-                        product.name
-                      );
-
-                      setStock(
-                        product.stock.toString()
-                      );
-
-                      setCategory(
-                        product.category
-                      );
-
-                      setSizes(
-                        product.sizes.map(
-                          (s) => ({
-                            size: s.size,
-                            price:
-                              s.price.toString(),
-                          })
-                        )
-                      );
-                    }}
+                    onClick={() => startEdit(product)}
                     className="bg-yellow-600 hover:bg-yellow-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
                     تعديل
@@ -345,9 +442,30 @@ export default function Products() {
                 </td>
               </tr>
             ))}
+
+            {filteredProducts.length === 0 && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="p-6 text-center text-stone-500 dark:text-stone-400"
+                >
+                  لا توجد منتجات مطابقة
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        loading={isDeleting}
+        title="حذف المنتج"
+        message={`هل أنت متأكد من حذف "${deleteTarget?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmLabel="حذف"
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={confirmDeleteProduct}
+      />
     </div>
   );
 }

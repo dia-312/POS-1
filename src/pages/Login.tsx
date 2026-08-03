@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -18,6 +18,9 @@ export default function Login() {
   const [pin, setPin] =
     useState("");
 
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isPinLoggingIn, setIsPinLoggingIn] = useState(false);
+
   const login = useAuthStore(
     (s) => s.login
   );
@@ -26,40 +29,52 @@ export default function Login() {
 
   /* LOGIN */
 
-  const handleLogin = async () => {
-    const user = await loginUser(
-      username,
-      password
-    );
+  const handleLogin = async (e?: FormEvent) => {
+    e?.preventDefault();
 
-    if (!user) {
-      alert("اسم المستخدم أو كلمة المرور غير صحيحة");
+    if (isLoggingIn) return;
+    setIsLoggingIn(true);
 
-      return;
-    }
-
-    login(user);
-
-    navigate("/");
-  };
-
-  /* PIN LOGIN */
-
-  const handlePinLogin =
-    async () => {
-      const user =
-        await loginWithPin(pin);
+    try {
+      const user = await loginUser(
+        username,
+        password
+      );
 
       if (!user) {
-        alert("رمز PIN غير صحيح");
-
+        alert("اسم المستخدم أو كلمة المرور غير صحيحة");
         return;
       }
 
       login(user);
-
       navigate("/");
-    };
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  /* PIN LOGIN */
+
+  const handlePinLogin = async (e?: FormEvent) => {
+    e?.preventDefault();
+
+    if (isPinLoggingIn) return;
+    setIsPinLoggingIn(true);
+
+    try {
+      const user = await loginWithPin(pin);
+
+      if (!user) {
+        alert("رمز PIN غير صحيح");
+        return;
+      }
+
+      login(user);
+      navigate("/");
+    } finally {
+      setIsPinLoggingIn(false);
+    }
+  };
 
   return (
     <div className="h-screen flex items-center justify-center bg-stone-100 dark:bg-stone-950">
@@ -68,41 +83,44 @@ export default function Login() {
           تسجيل الدخول
         </h1>
 
-        {/* USERNAME */}
+        <form onSubmit={handleLogin}>
+          {/* USERNAME */}
 
-        <input
-          placeholder="اسم المستخدم"
-          value={username}
-          className="w-full mb-3 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
-          onChange={(e) =>
-            setUsername(
-              e.target.value
-            )
-          }
-        />
+          <input
+            placeholder="اسم المستخدم"
+            value={username}
+            className="w-full mb-3 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
+            onChange={(e) =>
+              setUsername(
+                e.target.value
+              )
+            }
+          />
 
-        {/* PASSWORD */}
+          {/* PASSWORD */}
 
-        <input
-          type="password"
-          placeholder="كلمة المرور"
-          value={password}
-          className="w-full mb-5 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
-          onChange={(e) =>
-            setPassword(
-              e.target.value
-            )
-          }
-        />
+          <input
+            type="password"
+            placeholder="كلمة المرور"
+            value={password}
+            className="w-full mb-5 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+          />
 
-        {/* LOGIN */}
+          {/* LOGIN */}
 
-        <button
-          onClick={handleLogin}
-          className="w-full bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white p-3 rounded"
-        >
-          تسجيل الدخول
-        </button>
+          <button
+            type="submit"
+            disabled={isLoggingIn}
+            className="w-full bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white p-3 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoggingIn ? "جارٍ الدخول..." : "تسجيل الدخول"}
+          </button>
+        </form>
 
         {/* PIN LOGIN */}
 
@@ -111,23 +129,24 @@ export default function Login() {
             تسجيل دخول سريع برمز PIN
           </h2>
 
-          <input
-            placeholder="رمز PIN"
-            value={pin}
-            onChange={(e) =>
-              setPin(e.target.value)
-            }
-            className="w-full mb-3 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
-          />
+          <form onSubmit={handlePinLogin}>
+            <input
+              placeholder="رمز PIN"
+              value={pin}
+              onChange={(e) =>
+                setPin(e.target.value)
+              }
+              className="w-full mb-3 p-3 rounded bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
+            />
 
-          <button
-            onClick={
-              handlePinLogin
-            }
-            className="w-full bg-green-600 hover:bg-green-700 text-stone-900 dark:text-white p-3 rounded"
-          >
-            دخول بواسطة PIN
-          </button>
+            <button
+              type="submit"
+              disabled={isPinLoggingIn}
+              className="w-full bg-green-600 hover:bg-green-700 text-stone-900 dark:text-white p-3 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isPinLoggingIn ? "جارٍ الدخول..." : "دخول بواسطة PIN"}
+            </button>
+          </form>
         </div>
       </div>
     </div>

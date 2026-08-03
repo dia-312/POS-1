@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import {
   getUsers,
   addUser,
+  updateUser,
   deleteUser,
 } from "../lib/database";
+
+import ConfirmModal from "../components/ui/ConfirmModal";
+import toast from "react-hot-toast";
 
 type User = {
   id: number;
@@ -16,6 +20,15 @@ export default function Users() {
   const [users, setUsers] = useState<User[]>(
     []
   );
+
+  const [deleteTarget, setDeleteTarget] =
+    useState<User | null>(null);
+
+  const [editingId, setEditingId] =
+    useState<number | null>(null);
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [username, setUsername] =
     useState("");
@@ -35,27 +48,82 @@ export default function Users() {
     setUsers(data);
   }
 
-  async function handleAddUser() {
-    if (!username || !password) return;
-
-    await addUser(
-      username,
-      password,
-      role,
-      pin || "0000"
-    );
-
+  function resetForm() {
+    setEditingId(null);
     setUsername("");
     setPassword("");
     setPin("");
-
-    loadUsers();
+    setRole("cashier");
   }
 
-  async function handleDelete(id: number) {
-    await deleteUser(id);
+  function startEdit(user: User) {
+    setEditingId(user.id);
+    setUsername(user.username);
+    setRole(user.role);
+    setPassword("");
+    setPin("");
+  }
 
-    loadUsers();
+  async function handleSubmit(e?: FormEvent) {
+    e?.preventDefault();
+
+    if (!username || (!editingId && !password) || isSaving) return;
+
+    setIsSaving(true);
+
+    try {
+      if (editingId) {
+        await updateUser(
+          editingId,
+          username,
+          role,
+          password || undefined,
+          pin || undefined
+        );
+
+        toast.success("تم تحديث المستخدم بنجاح");
+      } else {
+        await addUser(
+          username,
+          password,
+          role,
+          pin || "0000"
+        );
+
+        toast.success("تمت إضافة المستخدم بنجاح");
+      }
+
+      resetForm();
+      await loadUsers();
+    } catch (err) {
+      console.error(err);
+      toast.error("حدث خطأ أثناء حفظ المستخدم");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function confirmDeleteUser() {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
+
+    try {
+      await deleteUser(deleteTarget.id);
+
+      if (editingId === deleteTarget.id) {
+        resetForm();
+      }
+
+      await loadUsers();
+      toast.success("تم حذف المستخدم بنجاح");
+    } catch (err) {
+      console.error(err);
+      toast.error("فشل حذف المستخدم");
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
+    }
   }
 
   useEffect(() => {
@@ -70,7 +138,30 @@ export default function Users() {
 
       {/* FORM */}
 
-      <div className="bg-white dark:bg-stone-800 p-6 rounded-2xl border border-stone-200 dark:border-stone-700 mb-6">
+      <form
+        onSubmit={handleSubmit}
+        className={`bg-white dark:bg-stone-800 p-6 rounded-2xl border mb-6 transition-colors ${
+          editingId
+            ? "border-amber-500"
+            : "border-stone-200 dark:border-stone-700"
+        }`}
+      >
+        {editingId && (
+          <div className="flex items-center justify-between mb-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3">
+            <span className="text-amber-800 dark:text-amber-300 font-medium">
+              جاري تعديل: {username || "..."}
+            </span>
+
+            <button
+              type="button"
+              onClick={resetForm}
+              className="text-amber-800 dark:text-amber-300 text-sm hover:underline"
+            >
+              إلغاء التعديل
+            </button>
+          </div>
+        )}
+
         <div className="grid grid-cols-3 gap-4">
           <input
             value={username}
@@ -86,7 +177,11 @@ export default function Users() {
             onChange={(e) =>
               setPassword(e.target.value)
             }
-            placeholder="كلمة المرور"
+            placeholder={
+              editingId
+                ? "كلمة مرور جديدة (اتركها فارغة للإبقاء عليها)"
+                : "كلمة المرور"
+            }
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
@@ -95,7 +190,11 @@ export default function Users() {
             onChange={(e) =>
               setPin(e.target.value)
             }
-            placeholder="رمز PIN"
+            placeholder={
+              editingId
+                ? "PIN جديد (اتركه فارغاً للإبقاء عليه)"
+                : "رمز PIN"
+            }
             className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg px-4 py-3 text-stone-900 dark:text-white"
           />
 
@@ -116,13 +215,30 @@ export default function Users() {
           </select>
         </div>
 
-        <button
-          onClick={handleAddUser}
-          className="mt-4 bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
-        >
-          إضافة مستخدم
-        </button>
-      </div>
+        <div className="flex gap-3 mt-4">
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="bg-amber-600 hover:bg-amber-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSaving
+              ? "جاري الحفظ..."
+              : editingId
+              ? "تحديث المستخدم"
+              : "إضافة مستخدم"}
+          </button>
+
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="bg-stone-200 hover:bg-stone-300 dark:bg-stone-700 dark:hover:bg-stone-600 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
+            >
+              إلغاء
+            </button>
+          )}
+        </div>
+      </form>
 
       {/* TABLE */}
 
@@ -152,7 +268,11 @@ export default function Users() {
             {users.map((user) => (
               <tr
                 key={user.id}
-                className="border-b border-stone-200 dark:border-stone-700"
+                className={`border-b border-stone-200 dark:border-stone-700 ${
+                  editingId === user.id
+                    ? "bg-amber-50 dark:bg-amber-950/20"
+                    : ""
+                }`}
               >
                 <td className="p-4 text-stone-900 dark:text-white">
                   {user.id}
@@ -166,12 +286,17 @@ export default function Users() {
                   {user.role === "admin" ? "مسؤول" : "كاشير"}
                 </td>
 
-                <td className="p-4">
+                <td className="p-4 flex gap-2">
+                  <button
+                    onClick={() => startEdit(user)}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
+                  >
+                    تعديل
+                  </button>
+
                   {user.role !== "admin" && (
                   <button
-                    onClick={() =>
-                      handleDelete(user.id)
-                    }
+                    onClick={() => setDeleteTarget(user)}
                     className="bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-4 py-2 rounded-lg"
                   >
                     حذف
@@ -183,6 +308,16 @@ export default function Users() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        loading={isDeleting}
+        title="حذف المستخدم"
+        message={`هل أنت متأكد من حذف المستخدم "${deleteTarget?.username}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmLabel="حذف"
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={confirmDeleteUser}
+      />
     </div>
   );
 }

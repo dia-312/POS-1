@@ -1,13 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import {
   addExpense,
+  deleteExpense,
   getExpenses,
 } from "../lib/database";
 
+import ConfirmModal from "../components/ui/ConfirmModal";
+import toast from "react-hot-toast";
+
+type Expense = {
+  id: number;
+  title: string;
+  amount: number;
+  created_at: string;
+};
+
 export default function Expenses() {
   const [expenses, setExpenses] =
-    useState<any[]>([]);
+    useState<Expense[]>([]);
 
   const [title, setTitle] =
     useState("");
@@ -15,24 +26,61 @@ export default function Expenses() {
   const [amount, setAmount] =
     useState("");
 
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [deleteTarget, setDeleteTarget] =
+    useState<Expense | null>(null);
+
   async function loadExpenses() {
     const data = await getExpenses();
 
     setExpenses(data);
   }
 
-  async function handleAddExpense() {
-    if (!title || !amount) return;
+  async function handleAddExpense(e?: FormEvent) {
+    e?.preventDefault();
 
-    await addExpense(
-      title,
-      Number(amount)
-    );
+    if (!title || !amount || isSaving) return;
 
-    setTitle("");
-    setAmount("");
+    setIsSaving(true);
 
-    loadExpenses();
+    try {
+      await addExpense(
+        title,
+        Number(amount)
+      );
+
+      toast.success("تمت إضافة المصروف بنجاح");
+
+      setTitle("");
+      setAmount("");
+
+      await loadExpenses();
+    } catch (err) {
+      console.error(err);
+      toast.error("حدث خطأ أثناء إضافة المصروف");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  async function confirmDeleteExpense() {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
+
+    try {
+      await deleteExpense(deleteTarget.id);
+      await loadExpenses();
+      toast.success("تم حذف المصروف بنجاح");
+    } catch (err) {
+      console.error(err);
+      toast.error("فشل حذف المصروف");
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
+    }
   }
 
   useEffect(() => {
@@ -47,7 +95,10 @@ export default function Expenses() {
 
       {/* FORM */}
 
-      <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6 mb-6">
+      <form
+        onSubmit={handleAddExpense}
+        className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl p-6 mb-6"
+      >
         <div className="grid grid-cols-2 gap-4">
           <input
             value={title}
@@ -70,12 +121,13 @@ export default function Expenses() {
         </div>
 
         <button
-          onClick={handleAddExpense}
-          className="mt-4 bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg"
+          type="submit"
+          disabled={isSaving}
+          className="mt-4 bg-red-600 hover:bg-red-700 text-stone-900 dark:text-white px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          إضافة مصروف
+          {isSaving ? "جاري الإضافة..." : "إضافة مصروف"}
         </button>
-      </div>
+      </form>
 
       {/* TABLE */}
 
@@ -93,6 +145,10 @@ export default function Expenses() {
 
               <th className="text-start p-4 text-stone-600 dark:text-stone-300">
                 التاريخ
+              </th>
+
+              <th className="text-start p-4 text-stone-600 dark:text-stone-300">
+                العمليات
               </th>
             </tr>
           </thead>
@@ -116,11 +172,41 @@ export default function Expenses() {
                     expense.created_at
                   ).toLocaleDateString()}
                 </td>
+
+                <td className="p-4">
+                  <button
+                    onClick={() => setDeleteTarget(expense)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                  >
+                    حذف
+                  </button>
+                </td>
               </tr>
             ))}
+
+            {expenses.length === 0 && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="p-6 text-center text-stone-500 dark:text-stone-400"
+                >
+                  لا توجد مصاريف مسجّلة
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        loading={isDeleting}
+        title="حذف المصروف"
+        message={`هل أنت متأكد من حذف "${deleteTarget?.title}"؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmLabel="حذف"
+        onClose={() => !isDeleting && setDeleteTarget(null)}
+        onConfirm={confirmDeleteExpense}
+      />
     </div>
   );
 }

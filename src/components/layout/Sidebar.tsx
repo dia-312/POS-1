@@ -83,7 +83,7 @@ export default function Sidebar() {
                 `px-4 py-3 rounded-xl transition ${
                   isActive
                     ? "bg-amber-600 text-stone-900 dark:text-white"
-                    : "text-stone-600 dark:text-stone-300 hover:bg-white dark:bg-stone-800 hover:text-stone-900 dark:hover:text-stone-900 dark:text-white"
+                    : "text-stone-600 dark:text-stone-300 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-900 dark:hover:text-white"
                 }`
               }
             >

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { getProducts, createSale } from "../lib/database";
+import { getProducts, createSale, decreaseStock } from "../lib/database";
+import { escapeHtml } from "../lib/html";
 import { useCartStore } from "../store/useCartStore";
 import toast from "react-hot-toast";
 import CheckoutModal from "../components/ui/CheckoutModal";
-import { useOrdersStore } from "../store/useOrdersStore";
 
 const CATEGORIES = [
   { id: "All", name: "الكل" },
@@ -38,8 +38,6 @@ export default function Cashier() {
     clearCart,
   } = useCartStore();
 
-  const { addOrder } = useOrdersStore();
-
   const filteredProducts = products.filter((product) => {
     if (!product || !product.name || product.name.trim() === "") return false;
 
@@ -63,18 +61,34 @@ export default function Cashier() {
   const total = subtotal - discountAmount;
 
   const handleCheckout = async () => {
-    const saleId = await createSale(total);
+    for (const item of cart) {
+      const product = products.find((p) => p.id === item.id);
+      const availableStock = product?.stock ?? 0;
+      const requested = cart
+        .filter((c) => c.id === item.id)
+        .reduce((sum, c) => sum + c.quantity, 0);
+
+      if (requested > availableStock) {
+        toast.error(`الكمية المطلوبة من "${item.name}" أكبر من المخزون المتوفر (${availableStock})`);
+        return;
+      }
+    }
+
+    const sale = await createSale(cart, subtotal, discount, total);
+
+    for (const item of cart) {
+      await decreaseStock(item.id, item.quantity);
+    }
+    await loadProducts();
 
     const orderData = {
-      id: saleId,
+      id: sale.id,
       items: cart,
       subtotal,
       discount,
       total,
-      createdAt: new Date().toISOString(),
+      createdAt: sale.createdAt,
     };
-
-    addOrder(orderData);
 
     const receiptHTML = `
       <p>رقم الطلب: #${orderData.id}</p>
@@ -87,8 +101,8 @@ export default function Cashier() {
           <div class="item">
             <div class="row">
               <span>
-                ${item.name}
-                ${item.selectedSize ? ` (${item.selectedSize})` : ""}
+                ${escapeHtml(item.name)}
+                ${item.selectedSize ? ` (${escapeHtml(item.selectedSize)})` : ""}
                 x${item.quantity}
               </span>
               <span>
@@ -98,7 +112,7 @@ export default function Cashier() {
 
             ${
               item.note
-                ? `<div class="note">ملاحظة: ${item.note}</div>`
+                ? `<div class="note">ملاحظة: ${escapeHtml(item.note)}</div>`
                 : ""
             }
           </div>
@@ -217,8 +231,13 @@ export default function Cashier() {
           <input
             type="number"
             placeholder="%"
+            min={0}
+            max={100}
             className="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-50 px-3 py-2 rounded-xl w-24 focus:outline-none focus:border-amber-500"
-            onChange={(e) => setDiscount(Number(e.target.value))}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              setDiscount(Number.isNaN(value) ? 0 : Math.min(100, Math.max(0, value)));
+            }}
           />
         </div>
 
@@ -240,7 +259,7 @@ export default function Cashier() {
         </div>
 
         {/* PRODUCTS */}
-        <div className="grid grid-cols-4 gap-4 overflow-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-auto">
           {filteredProducts.map((product) => {
             let sizes: any[] = [];
 

@@ -1,19 +1,32 @@
-import { useState } from "react";
-import { useOrdersStore } from "../store/useOrdersStore";
-import { deleteSale } from "../lib/database";
+import { useEffect, useState } from "react";
+import { deleteSale, getOrders } from "../lib/database";
+import { escapeHtml } from "../lib/html";
 import { useAuthStore } from "../store/useAuthStore";
+import ConfirmModal from "../components/ui/ConfirmModal";
 import toast from "react-hot-toast";
 
 export default function Orders() {
-  const { orders, setOrders } = useOrdersStore();
+  const [orders, setOrders] = useState<any[]>([]);
   const { user } = useAuthStore();
 
   const [selectedOrder, setSelectedOrder] =
     useState<number | null>(null);
 
+  const [deleteTargetId, setDeleteTargetId] =
+    useState<number | null>(null);
+
   const currentOrder = orders.find(
     (order) => order.id === selectedOrder
   );
+
+  const loadOrders = async () => {
+    const data = await getOrders();
+    setOrders(data);
+  };
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (user?.role !== "admin") {
@@ -22,17 +35,11 @@ export default function Orders() {
     }
 
     try {
-      console.log("DELETE CLICKED:", id);
-
       // 1. delete from database
       await deleteSale(id);
 
-      // 2. update zustand state immediately
-      const updatedOrders = orders.filter(
-        (o) => o.id !== id
-      );
-
-      setOrders(updatedOrders);
+      // 2. reload orders from the database
+      await loadOrders();
 
       // 3. IMPORTANT: delay dashboard refresh قليلاً
       setTimeout(() => {
@@ -47,7 +54,6 @@ export default function Orders() {
       }
 
       toast.success("تم حذف الطلب بنجاح");
-      console.log("DELETE DONE");
     } catch (err) {
       toast.error("فشل حذف الطلب");
       console.error("DELETE ERROR:", err);
@@ -69,8 +75,8 @@ export default function Orders() {
           <div class="item">
             <div class="row">
               <span>
-                ${item.name}
-                ${item.selectedSize ? ` (${item.selectedSize})` : ""}
+                ${escapeHtml(item.name)}
+                ${item.selectedSize ? ` (${escapeHtml(item.selectedSize)})` : ""}
                 x${item.quantity}
               </span>
               <span>
@@ -80,7 +86,7 @@ export default function Orders() {
 
             ${
               item.note
-                ? `<div class="note">ملاحظة: ${item.note}</div>`
+                ? `<div class="note">ملاحظة: ${escapeHtml(item.note)}</div>`
                 : ""
             }
           </div>
@@ -183,7 +189,7 @@ export default function Orders() {
               {user?.role === "admin" && (
                 <button
                   onClick={() =>
-                    handleDelete(order.id)
+                    setDeleteTargetId(order.id)
                   }
                   className="bg-red-600 text-white px-3 py-1 rounded"
                 >
@@ -244,6 +250,18 @@ export default function Orders() {
         )}
 
       </div>
+
+      <ConfirmModal
+        open={deleteTargetId !== null}
+        title="حذف الطلب"
+        message={`هل أنت متأكد من حذف الطلب #${deleteTargetId}؟ لا يمكن التراجع عن هذا الإجراء.`}
+        confirmLabel="حذف"
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={() => {
+          if (deleteTargetId !== null) handleDelete(deleteTargetId);
+          setDeleteTargetId(null);
+        }}
+      />
     </div>
   );
 }

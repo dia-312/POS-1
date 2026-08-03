@@ -1,14 +1,18 @@
+import { useState } from "react";
 import { useThemeStore } from "../store/useThemeStore";
 import { useNavigate } from "react-router-dom";
 import { open } from "@tauri-apps/plugin-dialog";
 import { readTextFile } from "@tauri-apps/plugin-fs";
 import { importDatabase } from "../lib/database";
 import { performAutomaticBackup } from "../lib/backup";
+import ConfirmModal from "../components/ui/ConfirmModal";
 import toast from "react-hot-toast";
 
 export default function Settings() {
   const { theme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
+
+  const [pendingRestorePath, setPendingRestorePath] = useState<string | null>(null);
 
   const handleRestore = async () => {
     try {
@@ -18,11 +22,24 @@ export default function Settings() {
       });
 
       if (selected && typeof selected === 'string') {
-        const contents = await readTextFile(selected);
-        await importDatabase(contents);
-        toast.success("تمت استعادة قاعدة البيانات بنجاح! جاري إعادة التحميل...");
-        setTimeout(() => { window.location.reload(); }, 1500);
+        setPendingRestorePath(selected);
       }
+    } catch (err) {
+      console.error(err);
+      toast.error("فشلت استعادة قاعدة البيانات");
+    }
+  };
+
+  const confirmRestore = async () => {
+    const path = pendingRestorePath;
+    setPendingRestorePath(null);
+    if (!path) return;
+
+    try {
+      const contents = await readTextFile(path);
+      await importDatabase(contents);
+      toast.success("تمت استعادة قاعدة البيانات بنجاح! جاري إعادة التحميل...");
+      setTimeout(() => { window.location.reload(); }, 1500);
     } catch (err) {
       console.error(err);
       toast.error("فشلت استعادة قاعدة البيانات");
@@ -87,6 +104,15 @@ export default function Settings() {
           </button>
         </div>
       </div>
+
+      <ConfirmModal
+        open={pendingRestorePath !== null}
+        title="استعادة النسخة الاحتياطية"
+        message="سيتم حذف كل البيانات الحالية (المنتجات، المستخدمين، المبيعات، المصاريف) واستبدالها بمحتوى ملف النسخة الاحتياطية. هذا الإجراء لا يمكن التراجع عنه."
+        confirmLabel="استعادة"
+        onClose={() => setPendingRestorePath(null)}
+        onConfirm={confirmRestore}
+      />
     </div>
   );
 }
