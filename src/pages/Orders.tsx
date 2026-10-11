@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { deleteSale, getOrders } from "../lib/database";
-import { escapeHtml } from "../lib/html";
+import { printReceipt, type ReceiptOrder } from "../lib/receipt";
 import { useAuthStore } from "../store/useAuthStore";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import toast from "react-hot-toast";
@@ -60,104 +60,11 @@ export default function Orders() {
     }
   };
 
-  const handlePrint = (orderData: any) => {
-    const subtotal = orderData.subtotal || orderData.items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);
-    const discount = orderData.discount || 0;
-
-    const receiptHTML = `
-      <p>رقم الطلب: #${orderData.id}</p>
-      ${
-        orderData.tableLabel
-          ? `<p>الطاولة: ${escapeHtml(orderData.tableLabel)}</p>`
-          : ""
-      }
-      <p>${new Date(orderData.createdAt || Date.now()).toLocaleString()}</p>
-      <hr />
-
-      ${orderData.items
-        .map(
-          (item: any) => `
-          <div class="item">
-            <div class="row">
-              <span>
-                ${escapeHtml(item.name)}
-                ${item.selectedSize ? ` (${escapeHtml(item.selectedSize)})` : ""}
-                x${item.quantity}
-              </span>
-              <span>
-                ₪${(item.price * item.quantity).toFixed(2)}
-              </span>
-            </div>
-
-            ${
-              item.note
-                ? `<div class="note">ملاحظة: ${escapeHtml(item.note)}</div>`
-                : ""
-            }
-          </div>
-        `
-        )
-        .join("")}
-
-      <hr />
-
-      <p>المجموع الفرعي: ₪${subtotal.toFixed(2)}</p>
-      <p>الخصم: ${discount}%</p>
-
-      <div class="total">
-        <span>الإجمالي</span>
-        <span>₪${orderData.total.toFixed(2)}</span>
-      </div>
-    `;
-
-    const fullHtml = `
-      <html>
-        <head>
-          <title>الطلب</title>
-          <style>
-            body { font-family: Arial; padding: 20px; color: black; direction: rtl; }
-            h1 { text-align: center; margin-bottom: 5px; }
-            h2 { text-align: center; font-size: 14px; color: #555; }
-            .item { margin: 10px 0; border-bottom: 1px dashed #ccc; padding-bottom: 8px; }
-            .row { display: flex; justify-content: space-between; }
-            .note { font-size: 12px; color: gray; margin-top: 4px; }
-            .total { margin-top: 20px; font-size: 20px; font-weight: bold; display: flex; justify-content: space-between; }
-            .page-break { page-break-after: always; break-after: page; }
-          </style>
-        </head>
-
-        <body>
-          <h1>MOOD YARD</h1>
-          <h2>(نسخة الزبون)</h2>
-          ${receiptHTML}
-
-          <div class="page-break"></div>
-
-          <h1>MOOD YARD</h1>
-          <h2>(نسخة الباريستا)</h2>
-          ${receiptHTML}
-        </body>
-      </html>
-    `;
-
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "fixed";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow?.document;
-    if (doc) {
-      doc.open();
-      doc.write(fullHtml);
-      doc.close();
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 1000);
-    }
+  const handlePrint = (orderData: ReceiptOrder) => {
+    printReceipt(orderData).catch((err) => {
+      console.error("PRINT ERROR:", err);
+      toast.error("تعذرت الطباعة");
+    });
   };
 
   return (

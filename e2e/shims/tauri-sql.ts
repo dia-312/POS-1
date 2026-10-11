@@ -1,7 +1,16 @@
 /* Browser stand-in for @tauri-apps/plugin-sql, used only by `vite --mode e2e`.
    It runs a real SQLite engine (sql.js, WASM), so the app's actual SQL is
    exercised. The database is saved to localStorage after every committed
-   write, so reloading the page behaves like restarting the desktop app. */
+   write, so reloading the page behaves like restarting the desktop app.
+
+   Two behaviours of the real plugin are reproduced on purpose:
+   - Explicit transactions are rejected. The real plugin runs every call on
+     whichever pooled connection is free, so BEGIN ... COMMIT across calls
+     fails there ("cannot start a transaction within a transaction",
+     "database is locked", ...) — code that relies on them must not pass here.
+   - A test can make statements fail: push { pattern, times } onto
+     window.__e2eFail and the next `times` statements containing `pattern`
+     throw "database is locked". */
 import initSqlJs, { type Database as SqlDatabase, type SqlValue } from "sql.js";
 import wasmUrl from "sql.js/dist/sql-wasm.wasm?url";
 
@@ -18,8 +27,21 @@ const fromBase64 = (text: string) =>
 
 const connections = new Map<string, Promise<E2EDatabase>>();
 
+type Fault = { pattern: string; times: number };
+
+const TRANSACTION_STATEMENT = /^\s*(BEGIN|COMMIT|END|ROLLBACK|SAVEPOINT|RELEASE)\b/i;
+
+function failIfInjected(sql: string) {
+  const faults = (globalThis as unknown as { __e2eFail?: Fault[] }).__e2eFail;
+  const fault = faults?.find((f) => f.times > 0 && sql.includes(f.pattern));
+
+  if (fault) {
+    fault.times--;
+    throw new Error("error returned from database: (code: 5) database is locked");
+  }
+}
+
 class E2EDatabase {
-  private inTransaction = false;
   private db: SqlDatabase;
   private storageKey: string;
 
@@ -55,24 +77,23 @@ class E2EDatabase {
   }
 
   private persist() {
-    // export() would roll back a transaction that is still open.
-    if (this.inTransaction) return;
     localStorage.setItem(this.storageKey, toBase64(this.db.export()));
   }
 
   async execute(sql: string, params: unknown[] = []) {
+    if (TRANSACTION_STATEMENT.test(sql)) {
+      throw new Error(
+        "explicit transactions are not supported by tauri-plugin-sql (pooled connections)"
+      );
+    }
+    failIfInjected(sql);
+
     this.db.run(sql, params.map((p) => (p === undefined ? null : p)) as SqlValue[]);
 
     const rowsAffected = this.db.getRowsModified();
     const lastInsertId = Number(
       this.db.exec("SELECT last_insert_rowid()")[0].values[0][0]
     );
-
-    if (/^\s*BEGIN/i.test(sql)) {
-      this.inTransaction = true;
-    } else if (/^\s*(COMMIT|END|ROLLBACK)/i.test(sql)) {
-      this.inTransaction = false;
-    }
 
     this.persist();
 

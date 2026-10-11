@@ -2,12 +2,16 @@ import Database from "@tauri-apps/plugin-sql";
 import defaultProducts from "./defaultProducts.json";
 import { hashSecret, verifySecret, isHashed } from "./crypto";
 
+/* VITE_DB_NAME lets a test or verification run use a throwaway database
+   instead of the shop's real one. */
+const DB_NAME = import.meta.env.VITE_DB_NAME ?? "pos-final.db";
+
 let db: any = null;
 
 /* GET DATABASE (raw handle — used by initDB itself) */
 async function getDB() {
   if (!db) {
-    db = await Database.load("sqlite:pos-final.db");
+    db = await Database.load(`sqlite:${DB_NAME}`);
   }
   return db;
 }
@@ -391,6 +395,13 @@ type SaleItemInput = {
   note?: string;
 };
 
+/* No BEGIN/COMMIT here on purpose. tauri-plugin-sql runs every execute()
+   on whichever pooled connection is free, so a transaction spread over
+   several calls breaks ("cannot start a transaction within a transaction",
+   "database is locked", "no transaction is active") and leaves a connection
+   stuck mid-transaction. Instead every step is ONE statement (all the items
+   go in a single INSERT, so they are saved together or not at all), and a
+   sale whose items could not be saved is deleted again. */
 export async function createSale(
   items: SaleItemInput[],
   subtotal: number,
@@ -402,26 +413,24 @@ export async function createSale(
   const database = await getReadyDB();
   const createdAt = new Date().toISOString();
 
-  await database.execute("BEGIN TRANSACTION");
+  const result: any = await database.execute(
+    `
+      INSERT INTO sales (total, subtotal, discount, created_at, table_label)
+      VALUES (?, ?, ?, ?, ?)
+    `,
+    [total, subtotal, discount, createdAt, tableLabel || null]
+  );
 
-  try {
-    const result: any = await database.execute(
-      `
-        INSERT INTO sales (total, subtotal, discount, created_at, table_label)
-        VALUES (?, ?, ?, ?, ?)
-      `,
-      [total, subtotal, discount, createdAt, tableLabel || null]
-    );
+  const saleId = result.lastInsertId;
 
-    const saleId = result.lastInsertId;
-
-    for (const item of items) {
+  if (items.length > 0) {
+    try {
       await database.execute(
         `
           INSERT INTO sale_items (sale_id, product_id, name, size, price, quantity, note)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
+          VALUES ${items.map(() => "(?, ?, ?, ?, ?, ?, ?)").join(", ")}
         `,
-        [
+        items.flatMap((item) => [
           saleId,
           item.id,
           item.name,
@@ -429,25 +438,41 @@ export async function createSale(
           item.price,
           item.quantity,
           item.note || null,
-        ]
+        ])
       );
+    } catch (err) {
+      // never leave a sale without its items behind
+      await database
+        .execute(`DELETE FROM sales WHERE id = ?`, [saleId])
+        .catch((cleanupErr: unknown) =>
+          console.error("COULD NOT REMOVE INCOMPLETE SALE:", cleanupErr)
+        );
+      throw err;
     }
-
-    // Closing a table's tab and recording its sale must happen together,
-    // otherwise a failure in between could leave a paid order still open.
-    if (openOrderId !== undefined) {
-      await database.execute(`DELETE FROM open_orders WHERE id = ?`, [
-        openOrderId,
-      ]);
-    }
-
-    await database.execute("COMMIT");
-
-    return { id: saleId, createdAt };
-  } catch (err) {
-    await database.execute("ROLLBACK");
-    throw err;
   }
+
+  // The sale is complete from here on. Closing the table's open order is
+  // retried, and if it still fails the caller is told instead of throwing —
+  // throwing would make the cashier sell the same order again.
+  let tableClosed = true;
+
+  if (openOrderId !== undefined) {
+    tableClosed = false;
+
+    for (let attempt = 0; attempt < 3 && !tableClosed; attempt++) {
+      try {
+        await database.execute(`DELETE FROM open_orders WHERE id = ?`, [
+          openOrderId,
+        ]);
+        tableClosed = true;
+      } catch (err) {
+        console.error("COULD NOT CLOSE TABLE ORDER:", err);
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+    }
+  }
+
+  return { id: saleId, createdAt, tableClosed };
 }
 
 /* OPEN ORDERS (one per table, edited until the bill is paid) */
