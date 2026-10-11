@@ -4,7 +4,7 @@ import { hashSecret, verifySecret, isHashed } from "./crypto";
 
 let db: any = null;
 
-/* GET DATABASE */
+/* GET DATABASE (raw handle — used by initDB itself) */
 async function getDB() {
   if (!db) {
     db = await Database.load("sqlite:pos-final.db");
@@ -12,8 +12,31 @@ async function getDB() {
   return db;
 }
 
-/* INIT DATABASE */
-export async function initDB() {
+/* GET DATABASE ONCE TABLES EXIST
+   Every data function goes through this so a page that mounts before
+   initDB() has finished (e.g. on a fresh database) waits instead of
+   failing with "no such table". */
+async function getReadyDB() {
+  await initDB();
+  return getDB();
+}
+
+/* INIT DATABASE
+   Single-flight: React StrictMode (and any double call) must not run the
+   create/seed/default-admin steps twice concurrently. */
+let initPromise: Promise<void> | null = null;
+
+export function initDB(): Promise<void> {
+  if (!initPromise) {
+    initPromise = runInitDB().catch((err) => {
+      initPromise = null; // allow a retry after a failed init
+      throw err;
+    });
+  }
+  return initPromise;
+}
+
+async function runInitDB() {
   const database = await getDB();
 
   /* USERS */
@@ -221,7 +244,7 @@ async function migrateLegacyLocalOrders() {
 
 /* LOGIN */
 export async function loginUser(username: string, password: string) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const result: any = await database.select(
     `
@@ -239,7 +262,7 @@ export async function loginUser(username: string, password: string) {
 }
 
 export async function loginWithPin(pin: string) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const users: any = await database.select(`SELECT * FROM users`);
 
@@ -254,7 +277,7 @@ export async function loginWithPin(pin: string) {
 
 /* PRODUCTS */
 export async function getProducts() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const products: any = await database.select(`
     SELECT * FROM products ORDER BY id DESC
@@ -272,7 +295,7 @@ export async function addProduct(
   category: string,
   sizes: any[]
 ) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const firstPrice =
     sizes.length > 0 ? Number(sizes[0].price) : 0;
@@ -293,7 +316,7 @@ export async function updateProduct(
   category: string,
   sizes: any[]
 ) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const firstPrice =
     sizes.length > 0 ? Number(sizes[0].price) : 0;
@@ -309,14 +332,14 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: number) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   await database.execute(`DELETE FROM products WHERE id=?`, [id]);
 }
 
 /* STOCK */
 export async function decreaseStock(id: number, quantity: number) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   await database.execute(
     `UPDATE products SET stock = stock - ? WHERE id=?`,
@@ -356,7 +379,7 @@ export async function createSale(
   discount: number,
   total: number
 ) {
-  const database = await getDB();
+  const database = await getReadyDB();
   const createdAt = new Date().toISOString();
 
   await database.execute("BEGIN TRANSACTION");
@@ -401,7 +424,7 @@ export async function createSale(
 
 /* ORDERS (sales + their line items) */
 export async function getOrders() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const sales: any = await database.select(
     `SELECT * FROM sales ORDER BY id DESC`
@@ -430,7 +453,7 @@ export async function getOrders() {
 
 /* 🔥 FIX MISSING: SALES CHART */
 export async function getSalesChart() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   return await database.select(`
     SELECT DATE(created_at, 'localtime') as date, SUM(total) as total
@@ -442,7 +465,7 @@ export async function getSalesChart() {
 
 /* DASHBOARD */
 export async function getDashboardStats() {
-  const database = await getDB();
+  const database = await getReadyDB();
   const { start, end } = getTodayBounds();
 
   const sales: any = await database.select(
@@ -466,7 +489,7 @@ export async function getDashboardStats() {
 }
 
 export async function getLowStockProducts() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   return await database.select(`
     SELECT * FROM products
@@ -477,7 +500,7 @@ export async function getLowStockProducts() {
 
 /* MONTHLY REPORTS */
 export async function getMonthlyReports() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const sales: any = await database.select(`
     SELECT strftime('%Y-%m', created_at, 'localtime') as month,
@@ -528,7 +551,7 @@ export async function getMonthlyReports() {
 
 /* TOTAL PROFIT */
 export async function getTotalProfit() {
-  const database = await getDB();
+  const database = await getReadyDB();
   const { start, end } = getTodayBounds();
 
   const result: any = await database.select(
@@ -545,7 +568,7 @@ export async function getTotalProfit() {
 
 /* USERS */
 export async function getUsers() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   return await database.select(`
     SELECT * FROM users ORDER BY id DESC
@@ -558,7 +581,7 @@ export async function addUser(
   role: string,
   pin: string
 ) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const hashedPassword = await hashSecret(password);
   const hashedPin = await hashSecret(pin);
@@ -579,7 +602,7 @@ export async function updateUser(
   password?: string,
   pin?: string
 ) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   await database.execute(
     `UPDATE users SET username = ?, role = ? WHERE id = ?`,
@@ -604,14 +627,14 @@ export async function updateUser(
 }
 
 export async function deleteUser(id: number) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   await database.execute(`DELETE FROM users WHERE id=?`, [id]);
 }
 
 /* EXPENSES */
 export async function addExpense(title: string, amount: number) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   await database.execute(
     `
@@ -623,7 +646,7 @@ export async function addExpense(title: string, amount: number) {
 }
 
 export async function getExpenses() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   return await database.select(`
     SELECT * FROM expenses
@@ -632,13 +655,13 @@ export async function getExpenses() {
 }
 
 export async function deleteExpense(id: number) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   await database.execute(`DELETE FROM expenses WHERE id=?`, [id]);
 }
 
 export async function getTotalExpenses() {
-  const database = await getDB();
+  const database = await getReadyDB();
   const { start, end } = getTodayBounds();
 
   const result: any = await database.select(
@@ -655,7 +678,7 @@ export async function getTotalExpenses() {
 
 /* DELETE SALE */
 export async function deleteSale(id: number) {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   await database.execute(`DELETE FROM sale_items WHERE sale_id=?`, [id]);
   await database.execute(`DELETE FROM sales WHERE id=?`, [id]);
@@ -663,7 +686,7 @@ export async function deleteSale(id: number) {
 
 /* EXPORT / IMPORT BACKUP */
 export async function exportDatabase() {
-  const database = await getDB();
+  const database = await getReadyDB();
 
   const users = await database.select(`SELECT * FROM users`);
   const products = await database.select(`SELECT * FROM products`);
@@ -675,7 +698,7 @@ export async function exportDatabase() {
 }
 
 export async function importDatabase(jsonString: string) {
-  const database = await getDB();
+  const database = await getReadyDB();
   const data = JSON.parse(jsonString);
 
   if (!data.users || !data.products || !data.sales || !data.expenses) {

@@ -16,16 +16,26 @@ function App() {
   const initTheme = useThemeStore((s) => s.initTheme);
 
   useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setInterval> | undefined;
+
     initDB().then(() => {
+      if (cancelled) return;
+
       // Automatic backup on startup
       performAutomaticBackup();
-      
+
       // Automatic backup every hour to capture End of Day state
-      setInterval(() => {
+      timer = setInterval(() => {
         performAutomaticBackup();
       }, 60 * 60 * 1000);
     });
     initTheme();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearInterval(timer);
+    };
   }, [initTheme]);
 
   const isLoginPage =
