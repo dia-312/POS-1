@@ -539,15 +539,36 @@ export async function deleteOpenOrder(id: number) {
   await database.execute(`DELETE FROM open_orders WHERE id = ?`, [id]);
 }
 
-/* ORDERS (sales + their line items) */
-export async function getOrders() {
+/* ORDERS (sales + their line items)
+   `sinceIso` limits the list to orders created at or after that instant, so
+   the page does not load years of history at once. */
+export async function getOrders(sinceIso?: string) {
   const database = await getReadyDB();
 
+  const where = sinceIso ? `WHERE created_at >= ?` : "";
+  const params = sinceIso ? [sinceIso] : [];
+
   const sales: any = await database.select(
-    `SELECT * FROM sales ORDER BY id DESC`
+    `SELECT * FROM sales ${where} ORDER BY id DESC`,
+    params
   );
 
-  const items: any = await database.select(`SELECT * FROM sale_items`);
+  const items: any = await database.select(
+    `SELECT * FROM sale_items${
+      sinceIso
+        ? " WHERE sale_id IN (SELECT id FROM sales WHERE created_at >= ?)"
+        : ""
+    }`,
+    params
+  );
+
+  // group the lines by sale once instead of scanning them for every sale
+  const itemsBySale = new Map<number, any[]>();
+  for (const item of items) {
+    const list = itemsBySale.get(item.sale_id);
+    if (list) list.push(item);
+    else itemsBySale.set(item.sale_id, [item]);
+  }
 
   return sales.map((sale: any) => ({
     id: sale.id,
@@ -556,17 +577,26 @@ export async function getOrders() {
     discount: sale.discount || 0,
     total: sale.total,
     tableLabel: sale.table_label || undefined,
-    items: items
-      .filter((item: any) => item.sale_id === sale.id)
-      .map((item: any) => ({
-        id: item.product_id,
-        name: item.name,
-        selectedSize: item.size || undefined,
-        price: item.price,
-        quantity: item.quantity,
-        note: item.note || undefined,
-      })),
+    items: (itemsBySale.get(sale.id) ?? []).map((item: any) => ({
+      id: item.product_id,
+      name: item.name,
+      selectedSize: item.size || undefined,
+      price: item.price,
+      quantity: item.quantity,
+      note: item.note || undefined,
+    })),
   }));
+}
+
+export async function hasOrdersBefore(beforeIso: string) {
+  const database = await getReadyDB();
+
+  const rows = (await database.select(
+    `SELECT 1 FROM sales WHERE created_at < ? LIMIT 1`,
+    [beforeIso]
+  )) as unknown[];
+
+  return rows.length > 0;
 }
 
 /* 🔥 FIX MISSING: SALES CHART */
@@ -579,6 +609,83 @@ export async function getSalesChart() {
     GROUP BY DATE(created_at, 'localtime')
     ORDER BY DATE(created_at, 'localtime')
   `);
+}
+
+/* DASHBOARD — the current calendar month (starts over on the 1st), with
+   today's figures alongside. Bounds are local midnights turned into the same
+   ISO strings the rows are stored with. Days are bucketed in JS rather than
+   with SQLite's localtime so every engine agrees on where a day starts. */
+function getMonthBounds(now: Date) {
+  return {
+    start: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
+    end: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(),
+  };
+}
+
+const localDayKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate()
+  ).padStart(2, "0")}`;
+
+export async function getDashboardOverview(now: Date = new Date()) {
+  const database = await getReadyDB();
+  const month = getMonthBounds(now);
+  const todayStart = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  ).toISOString();
+
+  const sales = (await database.select(
+    `SELECT total, created_at FROM sales WHERE created_at >= ? AND created_at < ?`,
+    [month.start, month.end]
+  )) as { total: number; created_at: string }[];
+
+  const expenses = (await database.select(
+    `SELECT amount, created_at FROM expenses WHERE created_at >= ? AND created_at < ?`,
+    [month.start, month.end]
+  )) as { amount: number; created_at: string }[];
+
+  const products = (await database.select(
+    `SELECT COUNT(*) as products FROM products`
+  )) as { products: number }[];
+
+  const figures = () => ({ revenue: 0, orders: 0, expenses: 0 });
+  const monthly = figures();
+  const today = figures();
+  const byDay = new Map<string, number>();
+
+  for (const sale of sales) {
+    monthly.revenue += sale.total;
+    monthly.orders += 1;
+
+    if (sale.created_at >= todayStart) {
+      today.revenue += sale.total;
+      today.orders += 1;
+    }
+
+    const key = localDayKey(new Date(sale.created_at));
+    byDay.set(key, (byDay.get(key) ?? 0) + sale.total);
+  }
+
+  for (const expense of expenses) {
+    monthly.expenses += expense.amount;
+    if (expense.created_at >= todayStart) today.expenses += expense.amount;
+  }
+
+  // one point per day from the 1st to today, zeros included
+  const chart: { day: number; date: string; total: number }[] = [];
+  for (let day = 1; day <= now.getDate(); day++) {
+    const key = localDayKey(new Date(now.getFullYear(), now.getMonth(), day));
+    chart.push({ day, date: key, total: byDay.get(key) ?? 0 });
+  }
+
+  return {
+    month: monthly,
+    today,
+    products: products[0]?.products || 0,
+    chart,
+  };
 }
 
 /* DASHBOARD */

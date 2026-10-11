@@ -281,12 +281,15 @@ test("an existing shop database upgrades without losing anything", async ({
   page,
   context,
 }) => {
+  // the old sale is from 5 January: pretend it is a few days later
+  await page.clock.install({ time: new Date("2026-01-10T09:00:00Z") });
   await plantLegacyDatabase(context);
   await loginAndOpenCashier(page);
 
   // old sale is intact and listed as a normal (no table) order
   await page.getByRole("link", { name: "الطلبات" }).click();
-  await expect(page.getByText("#1", { exact: true })).toBeVisible();
+  // ...under its own day
+  await expect(page.getByTestId("day-2026-01-05").getByTestId("order-1")).toContainText("#1");
   await page.getByRole("button", { name: "عرض" }).click();
   await expect(page.getByText("قهوة قديمة (Medium)")).toBeVisible();
   await expect(page.getByText("طاولة")).toHaveCount(0);

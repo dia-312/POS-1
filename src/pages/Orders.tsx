@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { deleteSale, getOrders } from "../lib/database";
+import { deleteSale, getOrders, hasOrdersBefore } from "../lib/database";
+import { groupOrdersByDay, timeOf } from "../lib/ordersByDay";
 import { printReceipt, type ReceiptOrder } from "../lib/receipt";
 import { useAuthStore } from "../store/useAuthStore";
 import ConfirmModal from "../components/ui/ConfirmModal";
 import toast from "react-hot-toast";
+
+const DAYS_PER_PAGE = 30;
 
 export default function Orders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -19,14 +22,46 @@ export default function Orders() {
     (order) => order.id === selectedOrder
   );
 
-  const loadOrders = async () => {
-    const data = await getOrders();
+  /* How far back the list reaches. Older days are loaded on request so the
+     page stays fast after years of sales. */
+  const [daysBack, setDaysBack] = useState(DAYS_PER_PAGE);
+  const [showAll, setShowAll] = useState(false);
+  const [hasOlder, setHasOlder] = useState(false);
+  const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
+
+  const loadOrders = async (days = daysBack) => {
+    if (showAll) {
+      setOrders(await getOrders());
+      setHasOlder(false);
+      return;
+    }
+
+    const today = new Date();
+    const since = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - (days - 1)
+    ).toISOString();
+
+    const [data, older] = await Promise.all([
+      getOrders(since),
+      hasOrdersBefore(since),
+    ]);
+
     setOrders(data);
+    setHasOlder(older);
   };
 
   useEffect(() => {
-    loadOrders();
-  }, []);
+    loadOrders(daysBack);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [daysBack, showAll]);
+
+  const dayGroups = groupOrdersByDay(orders);
+
+  // the newest day is open by default, older ones are folded
+  const isDayOpen = (key: string, index: number) =>
+    openDays[key] ?? index === 0;
 
   const handleDelete = async (id: number) => {
     if (user?.role !== "admin") {
@@ -71,49 +106,110 @@ export default function Orders() {
     <div className="grid grid-cols-3 gap-6 h-full">
 
       {/* ORDERS LIST */}
-      <div className="col-span-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 text-stone-900 dark:text-stone-50 shadow-sm">
+      <div className="col-span-2 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 text-stone-900 dark:text-stone-50 shadow-sm overflow-y-auto">
 
         <h1 className="text-2xl font-bold mb-4">
           الطلبات
         </h1>
 
-        {orders.map((order) => (
-          <div
-            key={order.id}
-            className="flex justify-between items-center p-4 border border-stone-200 dark:border-stone-800 rounded-xl mb-3 bg-stone-50 dark:bg-stone-800/50 hover:border-amber-500/50 transition-colors"
-          >
-            <div>
-              <p>
-                #{order.id}
-                {order.tableLabel && ` · طاولة ${order.tableLabel}`}
-              </p>
-              <p>{order.items.length} منتجات</p>
-              <p>₪{order.total}</p>
-            </div>
+        {dayGroups.length === 0 && (
+          <p className="text-stone-500 dark:text-stone-400">
+            لا توجد طلبات في هذه الفترة
+          </p>
+        )}
 
-            <div className="flex gap-2">
+        {dayGroups.map((group, index) => {
+          const open = isDayOpen(group.key, index);
+
+          return (
+            <section
+              key={group.key}
+              data-testid={`day-${group.key}`}
+              className="mb-4"
+            >
               <button
                 onClick={() =>
-                  setSelectedOrder(order.id)
+                  setOpenDays((days) => ({ ...days, [group.key]: !open }))
                 }
-                className="bg-amber-600 text-white px-3 py-1 rounded"
+                aria-expanded={open}
+                className="w-full flex justify-between items-center gap-4 px-4 py-3 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors text-start"
               >
-                عرض
+                <span className="font-bold">
+                  <span className="inline-block w-5 text-stone-500">
+                    {open ? "▾" : "◂"}
+                  </span>
+                  {group.label}
+                </span>
+
+                <span className="text-sm text-stone-600 dark:text-stone-300 whitespace-nowrap">
+                  {group.orders.length} طلبات · ₪{group.total.toFixed(2)}
+                </span>
               </button>
 
-              {user?.role === "admin" && (
-                <button
-                  onClick={() =>
-                    setDeleteTargetId(order.id)
-                  }
-                  className="bg-red-600 text-white px-3 py-1 rounded"
-                >
-                  حذف
-                </button>
-              )}
-            </div>
+              {open &&
+                group.orders.map((order) => (
+                  <div
+                    key={order.id}
+                    data-testid={`order-${order.id}`}
+                    className={`flex justify-between items-center p-4 border rounded-xl mt-2 bg-stone-50 dark:bg-stone-800/50 hover:border-amber-500/50 transition-colors ${
+                      order.id === selectedOrder
+                        ? "border-amber-500"
+                        : "border-stone-200 dark:border-stone-800"
+                    }`}
+                  >
+                    <div>
+                      <p>
+                        #{order.id}
+                        {order.tableLabel && ` · طاولة ${order.tableLabel}`}
+                        <span className="text-stone-500 dark:text-stone-400">
+                          {" "}
+                          · {timeOf(order.createdAt)}
+                        </span>
+                      </p>
+                      <p>{order.items.length} منتجات</p>
+                      <p>₪{order.total}</p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSelectedOrder(order.id)}
+                        className="bg-amber-600 text-white px-3 py-1 rounded"
+                      >
+                        عرض
+                      </button>
+
+                      {user?.role === "admin" && (
+                        <button
+                          onClick={() => setDeleteTargetId(order.id)}
+                          className="bg-red-600 text-white px-3 py-1 rounded"
+                        >
+                          حذف
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </section>
+          );
+        })}
+
+        {hasOlder && (
+          <div className="flex gap-3">
+            <button
+              onClick={() => setDaysBack((days) => days + DAYS_PER_PAGE)}
+              className="flex-1 py-3 rounded-xl border border-dashed border-amber-500 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
+            >
+              عرض طلبات أقدم
+            </button>
+
+            <button
+              onClick={() => setShowAll(true)}
+              className="flex-1 py-3 rounded-xl border border-dashed border-stone-400 text-stone-600 dark:text-stone-300 hover:bg-stone-500/10 transition-colors"
+            >
+              عرض كل الطلبات
+            </button>
           </div>
-        ))}
+        )}
       </div>
 
       {/* DETAILS */}
