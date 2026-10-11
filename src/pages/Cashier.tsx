@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getProducts, createSale, decreaseStock } from "../lib/database";
 import { escapeHtml } from "../lib/html";
-import { useCartStore } from "../store/useCartStore";
+import { useCartStore, selectActive } from "../store/useCartStore";
 import toast from "react-hot-toast";
 import CheckoutModal from "../components/ui/CheckoutModal";
+import ConfirmModal from "../components/ui/ConfirmModal";
+import NewTableModal from "../components/ui/NewTableModal";
 
 const CATEGORIES = [
   { id: "All", name: "الكل" },
@@ -25,11 +27,20 @@ export default function Cashier() {
   const [products, setProducts] = useState<any[]>([]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const [discount, setDiscount] = useState<number>(0);
+  const [newTableOpen, setNewTableOpen] = useState(false);
+  const [cancelTableOpen, setCancelTableOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   const {
-    cart,
+    quick,
+    tables,
+    activeId,
+    loadOpenOrders,
+    openTable,
+    selectOrder,
+    removeTable,
+    cancelTable,
+    setDiscount,
     addToCart,
     removeFromCart,
     increaseQuantity,
@@ -37,6 +48,15 @@ export default function Cashier() {
     updateNote,
     clearCart,
   } = useCartStore();
+
+  const active = useCartStore(selectActive);
+  const cart = active.items;
+  const discount = active.discount;
+  const isTable = active.id !== null;
+
+  const draftTotal = (draft: typeof active) =>
+    draft.items.reduce((sum, item) => sum + item.price * item.quantity, 0) *
+    (1 - draft.discount / 100);
 
   const filteredProducts = products.filter((product) => {
     if (!product || !product.name || product.name.trim() === "") return false;
@@ -61,6 +81,8 @@ export default function Cashier() {
   const total = subtotal - discountAmount;
 
   const handleCheckout = async () => {
+    if (paying || cart.length === 0) return;
+
     for (const item of cart) {
       const product = products.find((p) => p.id === item.id);
       const availableStock = product?.stock ?? 0;
@@ -74,12 +96,29 @@ export default function Cashier() {
       }
     }
 
-    const sale = await createSale(cart, subtotal, discount, total);
+    setPaying(true);
 
-    for (const item of cart) {
-      await decreaseStock(item.id, item.quantity);
+    let sale;
+    try {
+      sale = await createSale(
+        cart,
+        subtotal,
+        discount,
+        total,
+        isTable ? active.label : undefined,
+        isTable ? (active.id as number) : undefined
+      );
+
+      for (const item of cart) {
+        await decreaseStock(item.id, item.quantity);
+      }
+      await loadProducts();
+    } catch (err) {
+      console.error("CHECKOUT ERROR:", err);
+      toast.error("فشل إتمام الطلب");
+      setPaying(false);
+      return;
     }
-    await loadProducts();
 
     const orderData = {
       id: sale.id,
@@ -88,10 +127,16 @@ export default function Cashier() {
       discount,
       total,
       createdAt: sale.createdAt,
+      tableLabel: isTable ? active.label : undefined,
     };
 
     const receiptHTML = `
       <p>رقم الطلب: #${orderData.id}</p>
+      ${
+        orderData.tableLabel
+          ? `<p>الطاولة: ${escapeHtml(orderData.tableLabel)}</p>`
+          : ""
+      }
       <p>${new Date(orderData.createdAt).toLocaleString()}</p>
       <hr />
 
@@ -182,14 +227,34 @@ export default function Cashier() {
 
     toast.success("تم إنشاء الطلب بنجاح");
 
-    clearCart();
-    setDiscount(0);
+    // The sale already closed the table's open order in the database.
+    if (isTable) removeTable(active.id as number);
+    else clearCart();
+
     setCheckoutOpen(false);
+    setPaying(false);
+  };
+
+  const handleCancelTable = async () => {
+    if (active.id === null) return;
+
+    try {
+      await cancelTable(active.id);
+      toast.success("تم إلغاء الطلب");
+    } catch (err) {
+      console.error("CANCEL TABLE ERROR:", err);
+      toast.error("فشل إلغاء الطلب");
+    }
   };
 
   useEffect(() => {
     loadProducts();
-  }, []);
+
+    loadOpenOrders().catch((err) => {
+      console.error("LOAD OPEN ORDERS ERROR:", err);
+      toast.error("تعذر تحميل طلبات الطاولات");
+    });
+  }, [loadOpenOrders]);
 
   const loadProducts = async () => {
     const data = await getProducts();
@@ -203,6 +268,43 @@ export default function Cashier() {
       <div className="flex-1 flex flex-col">
 
         <h1 className="text-3xl font-bold mb-4 text-stone-900 dark:text-stone-50">الكاشير</h1>
+
+        {/* OPEN ORDERS: quick order + one tab per table */}
+        <div data-testid="order-tabs" className="flex gap-2 mb-4 overflow-x-auto pb-1 shrink-0">
+          {[quick, ...tables].map((draft) => {
+            const selected = draft.id === activeId;
+            const count = draft.items.reduce((s, i) => s + i.quantity, 0);
+
+            return (
+              <button
+                key={draft.id ?? "quick"}
+                data-testid={draft.id === null ? "tab-quick" : `tab-${draft.label}`}
+                onClick={() => selectOrder(draft.id)}
+                className={`shrink-0 px-4 py-2 rounded-xl text-sm transition-colors text-start ${
+                  selected
+                    ? "bg-amber-600 text-white"
+                    : "bg-stone-200 dark:bg-stone-800 text-stone-800 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700"
+                }`}
+              >
+                <span className="font-bold">
+                  {draft.id === null ? draft.label : `طاولة ${draft.label}`}
+                </span>
+                {count > 0 && (
+                  <span className="block text-xs opacity-80">
+                    {count} قطع · ₪{draftTotal(draft).toFixed(2)}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => setNewTableOpen(true)}
+            className="shrink-0 px-4 py-2 rounded-xl border border-dashed border-amber-500 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
+          >
+            + طاولة جديدة
+          </button>
+        </div>
 
         <input
           type="text"
@@ -233,6 +335,8 @@ export default function Cashier() {
             placeholder="%"
             min={0}
             max={100}
+            key={activeId ?? "quick"}
+            defaultValue={[0, 10, 30, 50].includes(discount) ? "" : discount}
             className="border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-50 px-3 py-2 rounded-xl w-24 focus:outline-none focus:border-amber-500"
             onChange={(e) => {
               const value = Number(e.target.value);
@@ -259,7 +363,7 @@ export default function Cashier() {
         </div>
 
         {/* PRODUCTS */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-auto">
+        <div data-testid="products" className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 overflow-auto">
           {filteredProducts.map((product) => {
             let sizes: any[] = [];
 
@@ -315,9 +419,11 @@ export default function Cashier() {
       </div>
 
       {/* CART */}
-      <div className="w-[340px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 rounded-2xl flex flex-col">
+      <div data-testid="cart" className="w-[340px] border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-5 rounded-2xl flex flex-col">
 
-        <h2 className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50">الطلب الحالي</h2>
+        <h2 className="text-xl font-bold mb-4 text-stone-900 dark:text-stone-50">
+          {isTable ? `طاولة ${active.label}` : "الطلب الحالي"}
+        </h2>
 
         <div className="flex-1 overflow-y-auto pr-2 space-y-3 mb-2">
           {cart.map((item) => (
@@ -391,10 +497,20 @@ export default function Cashier() {
 
           <button
             onClick={() => setCheckoutOpen(true)}
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-4 mt-4 rounded-xl font-bold transition-colors text-lg"
+            disabled={cart.length === 0 || paying}
+            className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:hover:bg-green-600 text-white py-4 mt-4 rounded-xl font-bold transition-colors text-lg"
           >
-            دفع وتأكيد
+            {isTable ? "دفع وإغلاق الطاولة" : "دفع وتأكيد"}
           </button>
+
+          {isTable && (
+            <button
+              onClick={() => setCancelTableOpen(true)}
+              className="w-full text-red-500 text-sm hover:underline font-medium mt-3"
+            >
+              إلغاء طلب الطاولة
+            </button>
+          )}
         </div>
 
       </div>
@@ -404,6 +520,25 @@ export default function Cashier() {
         onClose={() => setCheckoutOpen(false)}
         onConfirm={handleCheckout}
         total={total}
+      />
+
+      <NewTableModal
+        open={newTableOpen}
+        onClose={() => setNewTableOpen(false)}
+        onCreate={openTable}
+      />
+
+      <ConfirmModal
+        open={cancelTableOpen}
+        title="إلغاء طلب الطاولة"
+        message={`هل أنت متأكد من إلغاء طلب طاولة ${active.label}؟ سيتم حذف كل ما فيه دون تسجيل أي بيع.`}
+        confirmLabel="إلغاء الطلب"
+        cancelLabel="رجوع"
+        onClose={() => setCancelTableOpen(false)}
+        onConfirm={() => {
+          setCancelTableOpen(false);
+          handleCancelTable();
+        }}
       />
 
     </div>

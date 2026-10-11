@@ -66,6 +66,11 @@ export default function Orders() {
 
     const receiptHTML = `
       <p>رقم الطلب: #${orderData.id}</p>
+      ${
+        orderData.tableLabel
+          ? `<p>الطاولة: ${escapeHtml(orderData.tableLabel)}</p>`
+          : ""
+      }
       <p>${new Date(orderData.createdAt || Date.now()).toLocaleString()}</p>
       <hr />
 
@@ -171,7 +176,10 @@ export default function Orders() {
             className="flex justify-between items-center p-4 border border-stone-200 dark:border-stone-800 rounded-xl mb-3 bg-stone-50 dark:bg-stone-800/50 hover:border-amber-500/50 transition-colors"
           >
             <div>
-              <p>#{order.id}</p>
+              <p>
+                #{order.id}
+                {order.tableLabel && ` · طاولة ${order.tableLabel}`}
+              </p>
               <p>{order.items.length} منتجات</p>
               <p>₪{order.total}</p>
             </div>
@@ -206,7 +214,10 @@ export default function Orders() {
 
         {currentOrder ? (
           <>
-            <h2 className="text-xl font-bold mb-4">طلب رقم #{currentOrder.id}</h2>
+            <h2 className="text-xl font-bold mb-4">
+              طلب رقم #{currentOrder.id}
+              {currentOrder.tableLabel && ` · طاولة ${currentOrder.tableLabel}`}
+            </h2>
 
             <div className="space-y-2 mb-4">
               {currentOrder.items.map((item: any, idx: number) => (

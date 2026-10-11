@@ -87,6 +87,24 @@ async function runInitDB() {
     await database.execute(`ALTER TABLE sales ADD COLUMN discount REAL DEFAULT 0`);
   } catch {}
 
+  try {
+    await database.execute(`ALTER TABLE sales ADD COLUMN table_label TEXT`);
+  } catch {
+    // column already exists
+  }
+
+  /* OPEN ORDERS (table tabs that are still being served, not yet paid) */
+  await database.execute(`
+    CREATE TABLE IF NOT EXISTS open_orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      label TEXT NOT NULL UNIQUE,
+      items TEXT NOT NULL DEFAULT '[]',
+      discount REAL NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `);
+
   /* SALE ITEMS */
   await database.execute(`
     CREATE TABLE IF NOT EXISTS sale_items (
@@ -377,7 +395,9 @@ export async function createSale(
   items: SaleItemInput[],
   subtotal: number,
   discount: number,
-  total: number
+  total: number,
+  tableLabel?: string,
+  openOrderId?: number
 ) {
   const database = await getReadyDB();
   const createdAt = new Date().toISOString();
@@ -387,10 +407,10 @@ export async function createSale(
   try {
     const result: any = await database.execute(
       `
-        INSERT INTO sales (total, subtotal, discount, created_at)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO sales (total, subtotal, discount, created_at, table_label)
+        VALUES (?, ?, ?, ?, ?)
       `,
-      [total, subtotal, discount, createdAt]
+      [total, subtotal, discount, createdAt, tableLabel || null]
     );
 
     const saleId = result.lastInsertId;
@@ -413,6 +433,14 @@ export async function createSale(
       );
     }
 
+    // Closing a table's tab and recording its sale must happen together,
+    // otherwise a failure in between could leave a paid order still open.
+    if (openOrderId !== undefined) {
+      await database.execute(`DELETE FROM open_orders WHERE id = ?`, [
+        openOrderId,
+      ]);
+    }
+
     await database.execute("COMMIT");
 
     return { id: saleId, createdAt };
@@ -420,6 +448,70 @@ export async function createSale(
     await database.execute("ROLLBACK");
     throw err;
   }
+}
+
+/* OPEN ORDERS (one per table, edited until the bill is paid) */
+export async function getOpenOrders() {
+  const database = await getReadyDB();
+
+  const rows = (await database.select(
+    `SELECT * FROM open_orders ORDER BY id ASC`
+  )) as {
+    id: number;
+    label: string;
+    items: string;
+    discount: number | null;
+  }[];
+
+  return rows.map((row) => {
+    let items: SaleItemInput[] = [];
+    try {
+      items = JSON.parse(row.items);
+    } catch {
+      // unreadable items: show the table empty rather than failing the page
+    }
+
+    return {
+      id: row.id,
+      label: row.label,
+      items,
+      discount: row.discount || 0,
+    };
+  });
+}
+
+export async function createOpenOrder(label: string) {
+  const database = await getReadyDB();
+  const now = new Date().toISOString();
+
+  const result = (await database.execute(
+    `
+      INSERT INTO open_orders (label, items, discount, created_at, updated_at)
+      VALUES (?, '[]', 0, ?, ?)
+    `,
+    [label, now, now]
+  )) as { lastInsertId: number };
+
+  return result.lastInsertId;
+}
+
+export async function saveOpenOrder(
+  id: number,
+  items: SaleItemInput[],
+  discount: number
+) {
+  const database = await getReadyDB();
+
+  await database.execute(
+    `UPDATE open_orders SET items = ?, discount = ?, updated_at = ? WHERE id = ?`,
+    [JSON.stringify(items), discount, new Date().toISOString(), id]
+  );
+}
+
+export async function deleteOpenOrder(id: number) {
+  const database = await getReadyDB();
+
+  await database.execute(`DELETE FROM open_orders WHERE id = ?`, [id]);
 }
 
 /* ORDERS (sales + their line items) */
@@ -438,6 +530,7 @@ export async function getOrders() {
     subtotal: sale.subtotal || 0,
     discount: sale.discount || 0,
     total: sale.total,
+    tableLabel: sale.table_label || undefined,
     items: items
       .filter((item: any) => item.sale_id === sale.id)
       .map((item: any) => ({
@@ -693,8 +786,16 @@ export async function exportDatabase() {
   const sales = await database.select(`SELECT * FROM sales`);
   const saleItems = await database.select(`SELECT * FROM sale_items`);
   const expenses = await database.select(`SELECT * FROM expenses`);
+  const openOrders = await database.select(`SELECT * FROM open_orders`);
 
-  return JSON.stringify({ users, products, sales, saleItems, expenses });
+  return JSON.stringify({
+    users,
+    products,
+    sales,
+    saleItems,
+    expenses,
+    openOrders,
+  });
 }
 
 export async function importDatabase(jsonString: string) {
@@ -711,6 +812,7 @@ export async function importDatabase(jsonString: string) {
   await database.execute(`DELETE FROM products`);
   await database.execute(`DELETE FROM sales`);
   await database.execute(`DELETE FROM expenses`);
+  await database.execute(`DELETE FROM open_orders`);
 
   // Insert users
   for (const u of data.users) {
@@ -731,9 +833,26 @@ export async function importDatabase(jsonString: string) {
   // Insert sales
   for (const s of data.sales) {
     await database.execute(
-      `INSERT INTO sales (id, total, subtotal, discount, created_at) VALUES (?, ?, ?, ?, ?)`,
-      [s.id, s.total, s.subtotal || 0, s.discount || 0, s.created_at]
+      `INSERT INTO sales (id, total, subtotal, discount, created_at, table_label) VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        s.id,
+        s.total,
+        s.subtotal || 0,
+        s.discount || 0,
+        s.created_at,
+        s.table_label || null,
+      ]
     );
+  }
+
+  // Insert open table orders (absent from backups made before this feature)
+  if (Array.isArray(data.openOrders)) {
+    for (const o of data.openOrders) {
+      await database.execute(
+        `INSERT INTO open_orders (id, label, items, discount, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)`,
+        [o.id, o.label, o.items, o.discount || 0, o.created_at, o.updated_at]
+      );
+    }
   }
 
   // Insert sale items (backups created after order-details migration)
