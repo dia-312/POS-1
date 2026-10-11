@@ -85,3 +85,68 @@ export async function plantLegacyDatabase(context: BrowserContext) {
     ["e2e-sqlite:sqlite:pos-final.db", encoded] as const
   );
 }
+
+/* Make window.print() behave like the desktop app's WebView2 does: it does
+   not return while the print dialog is open (here: 1.5 s, during which the
+   whole page is frozen), then `afterprint` fires. Every call records what
+   the screen looked like at that moment in window.__printLog.
+   mode "throw" makes print() fail instead. */
+export async function stubPrinting(
+  page: Page,
+  mode: "freeze" | "throw" = "freeze"
+) {
+  await page.addInitScript((printMode) => {
+    const w = globalThis as unknown as {
+      __printLog: { modalOpen: boolean; cartText: string; frames: number; logoLoaded: boolean }[];
+    };
+    w.__printLog = [];
+
+    const descriptor = Object.getOwnPropertyDescriptor(
+      HTMLIFrameElement.prototype,
+      "contentWindow"
+    )!;
+    const patched = new WeakSet<object>();
+
+    Object.defineProperty(HTMLIFrameElement.prototype, "contentWindow", {
+      get() {
+        const win = descriptor.get!.call(this) as Window | null;
+
+        if (win && !patched.has(win)) {
+          patched.add(win);
+          win.print = () => {
+            w.__printLog.push({
+              modalOpen: document.body.innerText.includes("تأكيد الدفع"),
+              cartText:
+                document.querySelector('[data-testid="cart"]')?.textContent ?? "",
+              frames: document.querySelectorAll("iframe").length,
+              logoLoaded: Array.from(win.document.images).some(
+                (image) => image.complete && image.naturalWidth > 0
+              ),
+            });
+
+            if (printMode === "throw") throw new Error("no printer");
+
+            const end = Date.now() + 1500;
+            while (Date.now() < end) {
+              /* the page is frozen while the dialog is open */
+            }
+            win.dispatchEvent(new Event("afterprint"));
+          };
+        }
+
+        return win;
+      },
+    });
+  }, mode);
+}
+
+export async function printLog(page: Page) {
+  return page.evaluate(
+    () =>
+      (
+        globalThis as unknown as {
+          __printLog: { modalOpen: boolean; cartText: string; frames: number; logoLoaded: boolean }[];
+        }
+      ).__printLog
+  );
+}

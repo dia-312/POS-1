@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getProducts, createSale, decreaseStock } from "../lib/database";
-import { escapeHtml } from "../lib/html";
+import { printReceipt } from "../lib/receipt";
 import { useCartStore, selectActive } from "../store/useCartStore";
 import toast from "react-hot-toast";
 import CheckoutModal from "../components/ui/CheckoutModal";
@@ -30,6 +30,7 @@ export default function Cashier() {
   const [newTableOpen, setNewTableOpen] = useState(false);
   const [cancelTableOpen, setCancelTableOpen] = useState(false);
   const [paying, setPaying] = useState(false);
+  const checkoutLock = useRef(false);
 
   const {
     quick,
@@ -81,7 +82,9 @@ export default function Cashier() {
   const total = subtotal - discountAmount;
 
   const handleCheckout = async () => {
-    if (paying || cart.length === 0) return;
+    // Synchronous guard: state would still read "not paying" for a second
+    // click that arrives before React re-renders.
+    if (checkoutLock.current || cart.length === 0) return;
 
     for (const item of cart) {
       const product = products.find((p) => p.id === item.id);
@@ -96,11 +99,12 @@ export default function Cashier() {
       }
     }
 
+    checkoutLock.current = true;
     setPaying(true);
 
-    let sale;
+    let orderData;
     try {
-      sale = await createSale(
+      const sale = await createSale(
         cart,
         subtotal,
         discount,
@@ -109,130 +113,64 @@ export default function Cashier() {
         isTable ? (active.id as number) : undefined
       );
 
-      for (const item of cart) {
-        await decreaseStock(item.id, item.quantity);
+      // The sale is saved. From here nothing may stop the order from being
+      // finished and printed, so stock problems are reported, not thrown.
+      try {
+        for (const item of cart) {
+          await decreaseStock(item.id, item.quantity);
+        }
+        await loadProducts();
+      } catch (stockErr) {
+        console.error("STOCK UPDATE ERROR:", stockErr);
+        toast.error("تم حفظ الطلب لكن تعذر تحديث المخزون");
       }
-      await loadProducts();
+
+      if (!sale.tableClosed) {
+        toast.error(
+          "تم حفظ الطلب لكن تعذر إغلاق الطاولة. ألغِ طلب الطاولة يدوياً حتى لا يتكرر"
+        );
+      }
+
+      orderData = {
+        id: sale.id,
+        items: cart,
+        subtotal,
+        discount,
+        total,
+        createdAt: sale.createdAt,
+        tableLabel: isTable ? active.label : undefined,
+      };
     } catch (err) {
       console.error("CHECKOUT ERROR:", err);
       toast.error("فشل إتمام الطلب");
+      checkoutLock.current = false;
       setPaying(false);
       return;
     }
 
-    const orderData = {
-      id: sale.id,
-      items: cart,
-      subtotal,
-      discount,
-      total,
-      createdAt: sale.createdAt,
-      tableLabel: isTable ? active.label : undefined,
-    };
-
-    const receiptHTML = `
-      <p>رقم الطلب: #${orderData.id}</p>
-      ${
-        orderData.tableLabel
-          ? `<p>الطاولة: ${escapeHtml(orderData.tableLabel)}</p>`
-          : ""
-      }
-      <p>${new Date(orderData.createdAt).toLocaleString()}</p>
-      <hr />
-
-      ${orderData.items
-        .map(
-          (item) => `
-          <div class="item">
-            <div class="row">
-              <span>
-                ${escapeHtml(item.name)}
-                ${item.selectedSize ? ` (${escapeHtml(item.selectedSize)})` : ""}
-                x${item.quantity}
-              </span>
-              <span>
-                ₪${(item.price * item.quantity).toFixed(2)}
-              </span>
-            </div>
-
-            ${
-              item.note
-                ? `<div class="note">ملاحظة: ${escapeHtml(item.note)}</div>`
-                : ""
-            }
-          </div>
-        `
-        )
-        .join("")}
-
-      <hr />
-
-      <p>المجموع الفرعي: ₪${subtotal.toFixed(2)}</p>
-      <p>الخصم: ${discount}%</p>
-
-      <div class="total">
-        <span>الإجمالي</span>
-        <span>₪${orderData.total.toFixed(2)}</span>
-      </div>
-    `;
-
-    const fullHtml = `
-      <html>
-        <head>
-          <title>الطلب</title>
-          <style>
-            body { font-family: Arial; padding: 20px; color: black; direction: rtl; }
-            h1 { text-align: center; margin-bottom: 5px; }
-            h2 { text-align: center; font-size: 14px; color: #555; }
-            .item { margin: 10px 0; border-bottom: 1px dashed #ccc; padding-bottom: 8px; }
-            .row { display: flex; justify-content: space-between; }
-            .note { font-size: 12px; color: gray; margin-top: 4px; }
-            .total { margin-top: 20px; font-size: 20px; font-weight: bold; display: flex; justify-content: space-between; }
-            .page-break { page-break-after: always; break-after: page; }
-          </style>
-        </head>
-
-        <body>
-          <h1>MOOD YARD</h1>
-          <h2>(نسخة الزبون)</h2>
-          ${receiptHTML}
-
-          <div class="page-break"></div>
-
-          <h1>MOOD YARD</h1>
-          <h2>(نسخة الباريستا)</h2>
-          ${receiptHTML}
-        </body>
-      </html>
-    `;
-
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "fixed";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow?.document;
-    if (doc) {
-      doc.open();
-      doc.write(fullHtml);
-      doc.close();
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 1000);
-    }
-
-    toast.success("تم إنشاء الطلب بنجاح");
-
+    // The order is saved: finish it on screen BEFORE printing. The print
+    // dialog freezes the page while it is open, so anything left for after
+    // it would stay stale (open payment window, full cart) in the meantime.
     // The sale already closed the table's open order in the database.
     if (isTable) removeTable(active.id as number);
     else clearCart();
 
     setCheckoutOpen(false);
-    setPaying(false);
+    toast.success("تم إنشاء الطلب بنجاح");
+
+    // Print from a later task so the screen repaints first. The lock is held
+    // until then so no click can sell the same cart twice.
+    setTimeout(() => {
+      checkoutLock.current = false;
+      setPaying(false);
+
+      printReceipt(orderData).catch((err) => {
+        console.error("PRINT ERROR:", err);
+        toast.error(
+          "تعذرت الطباعة. الطلب محفوظ، يمكنك إعادة الطباعة من صفحة الطلبات"
+        );
+      });
+    }, 150);
   };
 
   const handleCancelTable = async () => {
