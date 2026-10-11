@@ -189,6 +189,12 @@ src-tauri/target/release/
 npm run test:e2e
 ```
 
+The end-to-end tests drive the real app in a browser (Microsoft Edge locally).
+They run Vite in `e2e` mode, which swaps the Tauri plugins for browser
+stand-ins (`e2e/shims/`): the database is a real SQLite engine (sql.js), so the
+app's actual SQL is exercised, and it survives page reloads like the desktop app
+survives a restart. No Tauri build or Rust toolchain is needed to run them.
+
 ---
 
 # 📄 License
